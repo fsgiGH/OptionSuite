@@ -1,0 +1,28 @@
+Package: OptionSuite
+Title: Comprehensive Option Pricing and Analysis Suite: Core Foundation
+Version: 0.1.0
+Authors@R: 
+    person("Fabio", "Spreafico", , "spreafab@gmail.com", role = c("aut", "cre"))
+Description: Provides the core foundation for option pricing and analysis.
+    Includes S3 classes for options and underlyings, European option pricing
+    via RQuantLib (Black-Scholes), American option pricing via the
+    Bjerksund-Stensland 2002 closed-form approximation, and full Greeks
+    (delta, gamma, vega, theta, rho). Features flexible expiry input
+    (Date, character, numeric), three construction modes (price only,
+    volatility only, or both), and global settings for risk-free rate
+    and day-count convention.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 3.5.0)
+Imports:
+    RQuantLib,
+    stats
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3

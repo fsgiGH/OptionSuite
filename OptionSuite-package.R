@@ -8,6 +8,7 @@
 #' @section Core Features:
 #' * **Option Pricing**: European options via Black-Scholes (RQuantLib) and
 #'   American options via Bjerksund-Stensland 2002 closed-form approximation
+#'   (from the fOptions package with modifications)
 #' * **Full Greeks**: Delta, gamma, vega, theta, rho for all option types
 #' * **Flexible Input**: Three construction modes (price only, IV only, or both)
 #'   enabling mispricing analysis
@@ -41,5 +42,6 @@
 #' @aliases OptionSuite
 #' @useDynLib OptionSuite, .registration = TRUE
 #' @import RQuantLib
+#' @import fOptions
 #' @importFrom stats pnorm
 NULL

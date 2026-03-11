@@ -1,4 +1,23 @@
 #' Create an option instrument
+#' 
+#' Option is the basic S3 object of the Suite describing this derivative financial
+#' instrument, provided with methods for extracting its value along time, up to expiration,
+#' as well as greeks and othe useful data. make_option is the constructor for specifying
+#' all the option features at entry.
+#' 
+#' Concerning entry_price (premium) and implied volatility, user, at construction, can
+#' specify both, if known. In this case, the theor_price method will return the price of
+#' the option as returned by the relevant theoretical pricing model, allowing an immediate
+#' verification whether the indicated (quoted) price is fair, or it represent a contract
+#' undervaluation or overvaluation.
+#' 
+#' In case the user provides only an entry price, the system automatically calculates the
+#' corresponding implied volatility according to the relevant pricing model (Black-Scholes for
+#' European style options or Bjerksund-Stensland for American options). In case implied volatility
+#' is provided but no entry price, the entry price will be calculated according to the model.
+#' For this being possible the user must provide the price of the underlying security in the appropriate
+#' input argument, or the system produces a warning and an error.
+#' 
 #' @param right Character, "c" for call or "p" for put
 #' @param strike Numeric, strike price
 #' @param expiry Date or numeric (time to maturity in years)
@@ -10,6 +29,23 @@
 #' @param date_of_entry Date, trade inception date (default Sys.Date())
 #' @param underlying_at_entry Numeric, underlying price at entry (required if entry_price provided without entry_iv)
 #' @param dividend_yield_at_entry Numeric, dividend yield at entry (default 0)
+#' 
+#' @examples
+#' may_put <- make_option(right = "p",
+#'                        strike = 50,
+#'                        expiry = as.Date("2026-05-15"),
+#'                        style = "a",
+#'                        commission = 1.00,
+#'                        entry_price = 1.27,
+#'                        underlying_at_entry = 51.7)
+#' # Implied volatility was automatically calculated
+#' (iv <- option.get_iv(may_put))  # Returns 0.2498553
+#' 
+#' # Use it in further calculations
+#' option.value(may_put, underlying = 52, ttm = 0.1) * iv
+#' 
+#' print(may_put) 
+#' 
 #' @return Object of class "option"
 #' @export
 make_option <- function(right = c("c", "p"),
@@ -132,7 +168,7 @@ make_option <- function(right = c("c", "p"),
       r = get_global_r(),
       q = dividend_yield_at_entry,
       T = ttm_at_entry,
-      sigma = entry_iv
+      iv = entry_iv
     )
     entry_price <- price_result$value
   }
@@ -185,6 +221,10 @@ print.option <- function(x, ...) {
 }
 
 #' Value of an option
+#' 
+#' Given an option object, a price of the underlying instrument, a time to maturity, and 
+#' a value of the implied volatility, this method returns the corresponding value of the option.
+#' 
 #' @param object An object of class "option"
 #' @param underlying Spot price of underlying
 #' @param ttm Time to maturity in years
@@ -192,6 +232,26 @@ print.option <- function(x, ...) {
 #' @param r Risk‑free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
 #' @param ... Additional arguments passed to price_option
+#' 
+#' @examples
+#' # example code
+#' may_put <- make_option(right = "p",
+#'                        strike = 50,
+#'                        expiry = as.Date("2026-05-15"),
+#'                        style = "a",
+#'                        commission = 1.00,
+#'                        entry_price = 1.27,
+#'                        date_of_entry = as.Date("2026-03-09)
+#'                        underlying_at_entry = 51.7)
+#' valuation_date <- as.Date("2026-04-15")
+#' valuation_price <- 49.5
+#' valuation_iv <- 0.35
+#' valuation_ttm <- date_to_ttm (as.Date("2026-05-15"), valuation_date)
+#' option.value(may_put,
+#'              valuation_price,
+#'              valuation_ttm,
+#'              valuation_iv)
+#' 
 #' @return Numeric value
 #' @export
 option.value <- function(object,
@@ -229,13 +289,31 @@ option.value.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    sigma = volatility,
+    iv = volatility,
     ...
   )
   res$value
 }
 
 #' Delta of an option
+#' 
+#' Returns the option's delta (per-share sensitivity to $1 change in underlying).
+#' 
+#' @param object An object of class "option"
+#' @param underlying Current spot price
+#' @param ttm Time to maturity in years (if missing, calculated)
+#' @param volatility Volatility (if NULL, uses stored IV)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (default 0)
+#' @param ... Additional arguments passed to price_option
+#' 
+#' @return Numeric delta (per share)
+#' 
+#' @examples
+#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
+#'                    entry_iv=0.2, underlying_at_entry=100)
+#' option.delta(opt, underlying=105, ttm=0.5)
+#' 
 #' @export
 option.delta <- function(object,
                          underlying,
@@ -266,13 +344,31 @@ option.delta.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    sigma = volatility,
+    iv = volatility,
     ...
   )
   res$delta
 }
 
 #' Gamma of an option
+#' 
+#' Returns the option's gamma (per-share sensitivity of delta to $1 change in underlying).
+#' 
+#' @param object An object of class "option"
+#' @param underlying Current spot price
+#' @param ttm Time to maturity in years (if missing, calculated)
+#' @param volatility Volatility (if NULL, uses stored IV)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (default 0)
+#' @param ... Additional arguments passed to price_option
+#' 
+#' @return Numeric gamma (per share)
+#' 
+#' @examples
+#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
+#'                    entry_iv=0.2, underlying_at_entry=100)
+#' option.gamma(opt, underlying=105, ttm=0.5)
+#' 
 #' @export
 option.gamma <- function(object,
                          underlying,
@@ -303,13 +399,31 @@ option.gamma.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    sigma = volatility,
+    iv = volatility,
     ...
   )
   res$gamma
 }
 
 #' Vega of an option
+#' 
+#' Returns the option's vega (per-share sensitivity to 1% change implied volatility).
+#' 
+#' @param object An object of class "option"
+#' @param underlying Current spot price
+#' @param ttm Time to maturity in years (if missing, calculated)
+#' @param volatility Volatility (if NULL, uses stored IV)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (default 0)
+#' @param ... Additional arguments passed to price_option
+#' 
+#' @return Numeric vega (per share)
+#' 
+#' @examples
+#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
+#'                    entry_iv=0.2, underlying_at_entry=100)
+#' option.vega(opt, underlying=105, ttm=0.5, volatility = 0.25)
+#' 
 #' @export
 option.vega <- function(object,
                         underlying,
@@ -340,13 +454,31 @@ option.vega.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    sigma = volatility,
+    iv = volatility,
     ...
   )
   res$vega
 }
 
 #' Theta of an option
+#' 
+#' Returns the option's theta (per-share sensitivity to time decay, daily).
+#' 
+#' @param object An object of class "option"
+#' @param underlying Current spot price
+#' @param ttm Time to maturity in years (if missing, calculated)
+#' @param volatility Volatility (if NULL, uses stored IV)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (default 0)
+#' @param ... Additional arguments passed to price_option
+#' 
+#' @return Numeric theta (per share, daily)
+#' 
+#' @examples
+#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
+#'                    entry_iv=0.2, underlying_at_entry=100)
+#' option.theta(opt, underlying=105, ttm=0.5)
+#' 
 #' @export
 option.theta <- function(object,
                          underlying,
@@ -377,13 +509,31 @@ option.theta.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    sigma = volatility,
+    iv = volatility,
     ...
   )
   res$theta
 }
 
 #' Rho of an option
+#' 
+#' Returns the option's rho (per-share sensitivity to 1% change of risk-free interest rate).
+#' 
+#' @param object An object of class "option"
+#' @param underlying Current spot price
+#' @param ttm Time to maturity in years (if missing, calculated)
+#' @param volatility Volatility (if NULL, uses stored IV)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (default 0)
+#' @param ... Additional arguments passed to price_option
+#' 
+#' @return Numeric theta (per share, daily)
+#' 
+#' @examples
+#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
+#'                    entry_iv=0.2, underlying_at_entry=100)
+#' option.rho(opt, underlying=105, ttm=0.5, r = 0.06)
+#' 
 #' @export
 option.rho <- function(object,
                        underlying,
@@ -414,7 +564,7 @@ option.rho.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    sigma = volatility,
+    iv = volatility,
     ...
   )
   res$rho
@@ -437,7 +587,24 @@ option.rho.option <- function(object,
 #' }
 #' 
 #' @return Numeric theoretical price (per share)
-#' @export
+#' 
+#' @examples
+#' # On 09/03/2026 SPY closed at 678.27 and TWS is indicating an average IV of 20.3%
+#' # The Jun18(2026) 275 call is selling for 31.00x31.46 (mid price = 31.23). Risk free
+#' # rate is 4.5%, and SPY divident yield is 1.1%
+#' set_global_r(0.045)
+#' entry_date <- as.Date("2026-03-09")
+#' june_call <- make_option(right = "c",
+#'                          strike = 675,
+#'                          expiry = as.Date("2026-06-18"),
+#'                          style = "a",
+#'                          entry_price = 31.23,
+#'                          entry_iv = 0.203,
+#'                          date_of_entry = entry_date,
+#'                          underlying_at_entry = 678.27,
+#'                          dividend_yield_at_entry = 0.011)
+#' ttm <- date_to_ttm(as.Date("2026-06-18"), entry_date)
+#' option.theor_price(june_call, 678.27, ttm)
 #' @export
 option.theor_price <- function(object,
                                underlying,
@@ -445,7 +612,10 @@ option.theor_price <- function(object,
                                r = NULL,
                                q = 0,
                                ...) {
-  option.value(object, underlying, ttm, volatility = object$iv, r = r, q = q, ...)
+  if (is.null(volatility)) {
+    volatility <- object$iv
+  }
+  option.value(object, underlying, ttm, volatility = volatility, r = r, q = q, ...)
 }
 
 #' Intrinsic value
@@ -531,7 +701,7 @@ option.analytics.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    sigma = volatility,
+    iv = volatility,
     ...
   )
   

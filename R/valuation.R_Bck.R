@@ -15,7 +15,7 @@ require(fOptions)
 #' @param r Risk‑free rate (if NULL, uses global)
 #' @param q Dividend yield
 #' @param T Time to maturity (years)
-#' @param iv Implied volatility
+#' @param iv Volatility
 #' @param use_min_ttm Logical; if TRUE and T < min_reliable, use min_reliable for Greeks
 #' @return List with components: value, delta, gamma, vega, theta, rho, dividendRho
 #' @keywords internal
@@ -71,13 +71,13 @@ price_european <- function(type = c("c", "p"),
   
   # Apply broker-convention scaling
   list(
-    value = opt$value,                    # Already per share
-    delta = opt$delta,                     # Already per share
-    gamma = opt$gamma,                     # Already per share
+    value = opt$value,                    # Already per share ✓
+    delta = opt$delta,                     # Already per share ✓
+    gamma = opt$gamma,                     # Already per share ✓
     vega  = opt$vega * 0.01,                # Per share, per 1% IV change
     theta = opt$theta / 365,                 # Per share, daily
     rho   = opt$rho * 0.01,                  # Per share, per 1% rate change
-    dividendRho = if (!is.null(opt$dividendRho)) opt$dividendRho * 0.01 else NULL
+    dividendRho = if (!is.null(opt$dividendRho)) opt$dividendRho * 0.01 / 100 else NULL
   )
 }
 
@@ -85,7 +85,7 @@ price_european <- function(type = c("c", "p"),
 # American options – using fOptions for pricing, finite differences for Greeks
 # ============================================================================
 
-# ---- Helper functions (finite differences) ----
+# ---- Helper functions (same as before) ----
 
 Phi <- function(x) pnorm(x)
 
@@ -104,21 +104,20 @@ fd_gamma <- function(f, x, h = 1e-4, ...) {
 fd_vega <- function(f, iv, h = 1e-4, ...) {
   # Raw derivative: change for 1.0 change in iv
   raw_deriv <- (f(iv = iv * (1 + h), ...) - f(iv = iv * (1 - h), ...)) / (2 * iv * h)
-  # Scale to 1% (0.01) change (broker convention)
+  # Scale to 1% (0.01) change
+  raw_deriv * 0.01
+}
+
+fd_rho <- function(f, r, h = 1e-4, ...) {
+  raw_deriv <- (f(r = r * (1 + h), ...) - f(r = r * (1 - h), ...)) / (2 * r * h)
   raw_deriv * 0.01
 }
 
 fd_theta <- function(f, T, h = 1/365, ...) {
+  # Return daily theta (TWS/ToS convention)
   if (T <= h) return(NA)
-  # Daily theta (broker convention)
+  # Change over one day, divided by 1 day
   (f(T = T - h, ...) - f(T = T, ...)) / 1
-}
-
-fd_rho <- function(f, r, h = 1e-4, ...) {
-  # Raw derivative: change for 1.0 change in r
-  raw_deriv <- (f(r = r * (1 + h), ...) - f(r = r * (1 - h), ...)) / (2 * r * h)
-  # Scale to 1% (0.01) change (broker convention)
-  raw_deriv * 0.01
 }
 
 #' Price an American option and return full Greeks
@@ -128,7 +127,7 @@ fd_rho <- function(f, r, h = 1e-4, ...) {
 #' @param r Risk‑free rate (if NULL, uses global)
 #' @param q Dividend yield
 #' @param T Time to maturity
-#' @param iv Implied volatility
+#' @param iv Volatility
 #' @param use_min_ttm Logical; if TRUE and T < min_reliable, use min_reliable for Greeks
 #' @return List with value, delta, gamma, vega, theta, rho
 #' @keywords internal
@@ -136,8 +135,9 @@ price_american <- function(type = c("c", "p"),
                            S, K,
                            r = NULL, q,
                            T,
-                           iv,
+                           iv,  # Renamed from iv
                            use_min_ttm = FALSE) {
+  
   type <- match.arg(type)
   if (is.null(r)) r <- get_global_r()
   min_ttm <- get_min_reliable_ttm()
@@ -146,7 +146,6 @@ price_american <- function(type = c("c", "p"),
   if (T <= min_ttm) {
     intrinsic <- if (type == "c") max(S - K, 0) else max(K - S, 0)
     if (T == 0 || !use_min_ttm) {
-      # Greeks at exact expiry (theoretical)
       delta <- if (type == "c") {
         if (S > K) 1 else if (S < K) 0 else NA
       } else {
@@ -161,7 +160,6 @@ price_american <- function(type = c("c", "p"),
         rho = 0
       ))
     } else {
-      # Value = exact, Greeks from min_reliable_ttm
       gr <- price_american(type, S, K, r, q, min_ttm, iv, use_min_ttm = FALSE)
       gr$value <- intrinsic
       return(gr)
@@ -169,11 +167,9 @@ price_american <- function(type = c("c", "p"),
   }
   
   # --- Normal case: T > min_ttm ---
-  b <- r - q  # cost of carry
+  b <- r - q
   type_flag <- if (type == "c") "c" else "p"
   
-  # Use fOptions for pricing (reliable implementation)
-  # Note: fOptions expects parameter 'sigma', we pass our 'iv'
   value <- fOptions::BSAmericanApproxOption(
     TypeFlag = type_flag,
     S = S,
@@ -181,11 +177,10 @@ price_american <- function(type = c("c", "p"),
     Time = T,
     r = r,
     b = b,
-    sigma = iv
+    sigma = iv  # iv passed as sigma to fOptions
   )@price
   
   # Greeks via finite differences
-  # Wrapper function for fOptions call
   val_fun <- function(S_val = S, iv_val = iv, r_val = r, T_val = T) {
     fOptions::BSAmericanApproxOption(
       TypeFlag = type_flag,
@@ -198,7 +193,6 @@ price_american <- function(type = c("c", "p"),
     )@price
   }
   
-  # Calculate Greeks using finite differences
   delta <- fd_greek(
     function(x, ...) val_fun(S_val = x, ...), 
     S, h = 1e-4, iv_val = iv, r_val = r, T_val = T
@@ -233,7 +227,6 @@ price_american <- function(type = c("c", "p"),
     rho = rho
   )
 }
-
 # ============================================================================
 # Unified dispatcher
 # ============================================================================
@@ -252,7 +245,7 @@ price_american <- function(type = c("c", "p"),
 #' @param r Rate (NULL uses global)
 #' @param q Dividend yield (0 by default)
 #' @param T Time to maturity
-#' @param iv Implied volatility
+#' @param iv Volatility
 #' @param ... Additional arguments passed to specific methods
 #' 
 #' @return List with value and Greeks
@@ -269,24 +262,25 @@ price_american <- function(type = c("c", "p"),
 #' ttm <- date_to_ttm(expiry, valuation_date)
 #' price_option(style = "a",
 #'              type = "c",
-#'              S = 60.22,
-#'              K = 60,
+#'              60.22,
+#'              60,
 #'              r = 0.045,
 #'              q = 0.042,
 #'              T = ttm,
 #'              iv = 0.288)
 #'              
-#' # As of March 8th 2026, SPX May14Put6740 is quoted on TWS 228.10x234.10, while S&P 500 quotes 6738.15
-#' # ATM implied volatility is reported as 20.5% while VIX is 29.49. ToS reports IV of 22.40%.
-#' # These options are European style with no dividends
+#' #As of March 8th 2026, SPX May14Put6740 is quotes on TWS 228.10x234.10, while the S&P 500 index quotes 6738.15
+#' #ATM implied volatility is reported as 20.5% while the VIX index is indicating 29.49. ToS reports the same quotation
+#' #but Implied volatility of 22.40%. These options have European style and no dividends
 #' 
+#' get_day_count_convention()
 #' expiry <- as.Date("2026-05-14")
 #' valuation_date <- as.Date("2026-03-08")
 #' ttm <- date_to_ttm(expiry, valuation_date)
 #' price_option(style = "e",
 #'              type = "p",
-#'              S = 6738.15,
-#'              K = 6740,
+#'              6738.15,
+#'              6740,
 #'              r = 0.045,
 #'              q = 0,
 #'              T = ttm,

@@ -38,3 +38,4 @@ List with components: value, delta, gamma, vega, theta, rho, dividendRho
 \description{
 Price a European option and return full Greeks
 }
+\keyword{internal}

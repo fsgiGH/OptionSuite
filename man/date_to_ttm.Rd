@@ -7,13 +7,24 @@
 date_to_ttm(expiry, valuation_date = Sys.Date())
 }
 \arguments{
-\item{expiry}{Date or numeric (if numeric, returned unchanged)}
+\item{expiry}{Date, character (YYYY-MM-DD) or numeric (if numeric, returned unchanged)}
 
-\item{valuation_date}{Date (ignored if expiry is numeric)}
+\item{valuation_date}{Date, character (YYYY-MM-DD) or missing (uses Sys.Date)}
 }
 \value{
 Time in years (calendar)
 }
 \description{
-Convert dates to time‑to‑maturity (always calendar years)
+Given an expiry, passed as a numeric (fraction of a year of 365 days or as a Date object), and an optional valuation date as a
+Date object (by default the current system date will be used) the function returns the time to maturity of the option as a fraction of
+the calendar year (365 days)
+}
+\examples{
+date_to_ttm(0.5)
+#option expiry
+option_maturity <- as.Date("2026-04-17")
+#valuation day
+today <- "2026-03-08"
+date_to_ttm(option_maturity, today)
+
 }

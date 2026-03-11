@@ -143,8 +143,8 @@ get_min_reliable_ttm <- function() {
 #' Date object (by default the current system date will be used) the function returns the time to maturity of the option as a fraction of
 #' the calendar year (365 days)
 #' 
-#' @param expiry Date or numeric (if numeric, returned unchanged)
-#' @param valuation_date Date (ignored if expiry is numeric)
+#' @param expiry Date, character (YYYY-MM-DD) or numeric (if numeric, returned unchanged)
+#' @param valuation_date Date, character (YYYY-MM-DD) or missing (uses Sys.Date)
 #' 
 #' @return Time in years (calendar)
 #' 
@@ -153,17 +153,31 @@ get_min_reliable_ttm <- function() {
 #' #option expiry
 #' option_maturity <- as.Date("2026-04-17")
 #' #valuation day
-#' today <- as.Date("2026-03-08")
+#' today <- "2026-03-08"
 #' date_to_ttm(option_maturity, today)
 #' 
 #' @export
 date_to_ttm <- function(expiry, valuation_date = Sys.Date()) {
+  # Handle character expiry
+  if (is.character(expiry)) {
+    expiry <- as.Date(expiry)
+  }
+  
+  # Handle character valuation_date
+  if (is.character(valuation_date)) {
+    valuation_date <- as.Date(valuation_date)
+  }
+  
   if (is.numeric(expiry)) {
     return(expiry)
   }
   if (!inherits(expiry, "Date")) {
-    stop("expiry must be Date or numeric")
+    stop("expiry must be Date, character (YYYY-MM-DD), or numeric")
   }
+  if (!inherits(valuation_date, "Date")) {
+    stop("valuation_date must be Date or character (YYYY-MM-DD)")
+  }
+  
   days <- as.numeric(difftime(expiry, valuation_date, units = "days"))
   return(days / 365)
 }

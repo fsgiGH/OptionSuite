@@ -10,7 +10,7 @@ price_option(
   S,
   K,
   r = NULL,
-  q,
+  q = 0,
   T,
   sigma,
   ...
@@ -27,7 +27,7 @@ price_option(
 
 \item{r}{Rate (NULL uses global)}
 
-\item{q}{Dividend yield}
+\item{q}{Dividend yield (0 by default)}
 
 \item{T}{Time to maturity}
 
@@ -39,5 +39,28 @@ price_option(
 List with value and Greeks
 }
 \description{
-Price an option (European or American) and return full Greeks
+Valuation is provided by applying the Black-Scholes model for European Options through the QuantLib public library
+or the Bjerksund–Stensland (2002) closed model for American options through an internally-developed implementation.
+Given the usual input parameters listed below, the returned object is a list containing option value at the given
+time to maturity and volatility levels, plus all the first-order greeks: delta, vega, theta, gamma, and rho.
+}
+\examples{
+#As of March 8th 2026, BMY Apr17Call60 is quoted on TWS 2.36x2.51, while BMY quotes 60.22
+#ATM Implied volatility is reported as 28.8\%. The very same data are confirmed on ToS, besides
+#BMY being quoted 60.29 and the bid-ask values for the option being 2.31x2.51
+#Dividend yield is indicated as 4.2\% and interest rate as 4.5\%
+
+get_day_count_convention()
+expiry <- as.Date("2026-04-17")
+valuation_date <- as.Date("2026-03-08")
+ttm <- date_to_ttm(expiry, valuation_date)
+price_option(style = "a",
+             type = "c",
+             60.22,
+             60,
+             r = 0.045,
+             q = 0.042,
+             T = ttm,
+             sigma = 0.288)
+
 }

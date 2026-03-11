@@ -38,3 +38,4 @@ List with value, delta, gamma, vega, theta, rho
 \description{
 Price an American option and return full Greeks
 }
+\keyword{internal}

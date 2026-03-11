@@ -486,9 +486,61 @@ behavior</p>
 <li>Report generation</li>
 </ul>
 <hr />
+</div>
+</div>
+<div id="greeks-display-conventions-update" class="section level2">
+<h2>Greeks Display Conventions (Update)</h2>
+<p><strong>Date:</strong> 2026-03-08</p>
+<p><strong>Decision:</strong> All Greeks are returned with the following
+scaling to match industry standards (TWS, ToS):</p>
+<table>
+<colgroup>
+<col width="35%" />
+<col width="35%" />
+<col width="30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Greek</th>
+<th>Scale</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Delta</td>
+<td>per share</td>
+<td>Change in option value for $1 change in underlying</td>
+</tr>
+<tr class="even">
+<td>Gamma</td>
+<td>per share</td>
+<td>Change in delta for $1 change in underlying</td>
+</tr>
+<tr class="odd">
+<td>Vega</td>
+<td>per share</td>
+<td>Change in option value for 1% (0.01) absolute change in IV</td>
+</tr>
+<tr class="even">
+<td>Theta</td>
+<td>per share, daily</td>
+<td>Change in option value for one calendar day</td>
+</tr>
+<tr class="odd">
+<td>Rho</td>
+<td>per share</td>
+<td>Change in option value for 1% (0.01) absolute change in rate</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rationale:</strong> - Matches broker displays that traders
+are accustomed to - Vega is per 1% (not per 1 unit of volatility)
+because IV is quoted in percent - Theta is daily (not annualized)
+because traders think in daily decay - Delta/Gamma are raw per-share
+sensitivities</p>
 <p><em>This file will be updated as new design decisions are
 made.</em></p>
-</div>
 </div>
 </div>
 

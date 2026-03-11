@@ -146,4 +146,25 @@ Three construction modes in `make_option()`:
 
 ---
 
+## Greeks Display Conventions (Update)
+
+**Date:** 2026-03-08
+
+**Decision:**
+All Greeks are returned with the following scaling to match industry standards (TWS, ToS):
+
+| Greek | Scale | Unit |
+|-------|-------|------|
+| Delta | per share | Change in option value for $1 change in underlying |
+| Gamma | per share | Change in delta for $1 change in underlying |
+| Vega | per share | Change in option value for 1% (0.01) absolute change in IV |
+| Theta | per share, daily | Change in option value for one calendar day |
+| Rho | per share | Change in option value for 1% (0.01) absolute change in rate |
+
+**Rationale:**
+- Matches broker displays that traders are accustomed to
+- Vega is per 1% (not per 1 unit of volatility) because IV is quoted in percent
+- Theta is daily (not annualized) because traders think in daily decay
+- Delta/Gamma are raw per-share sensitivities
+
 *This file will be updated as new design decisions are made.*

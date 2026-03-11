@@ -20,6 +20,7 @@ Depends:
     R (>= 3.5.0)
 Imports:
     RQuantLib,
+    fOptions,
     stats
 Suggests:
     testthat (>= 3.0.0),

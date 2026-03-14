@@ -25,5 +25,6 @@ option.value(object, underlying, ttm, volatility = NULL, r = NULL, q = 0, ...)
 Numeric value
 }
 \description{
-Value of an option
+Given an option object, a price of the underlying instrument, a time to maturity, and
+a value of the implied volatility, this method returns the corresponding value of the option.
 }

@@ -6,6 +6,30 @@
 \usage{
 option.delta(object, underlying, ttm, volatility = NULL, r = NULL, q = 0, ...)
 }
+\arguments{
+\item{object}{An object of class "option"}
+
+\item{underlying}{Current spot price}
+
+\item{ttm}{Time to maturity in years (if missing, calculated)}
+
+\item{volatility}{Volatility (if NULL, uses stored IV)}
+
+\item{r}{Risk-free rate (if NULL, uses global)}
+
+\item{q}{Dividend yield (default 0)}
+
+\item{...}{Additional arguments passed to price_option}
+}
+\value{
+Numeric delta (per share)
+}
 \description{
-Delta of an option
+Returns the option's delta (per-share sensitivity to $1 change in underlying).
+}
+\examples{
+opt <- make_option("c", strike=100, expiry="2026-12-31", 
+                   entry_iv=0.2, underlying_at_entry=100)
+option.delta(opt, underlying=105, ttm=0.5)
+
 }

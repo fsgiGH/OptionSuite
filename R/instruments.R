@@ -606,6 +606,7 @@ option.rho.option <- function(object,
 #' ttm <- date_to_ttm(as.Date("2026-06-18"), entry_date)
 #' option.theor_price(june_call, 678.27, ttm)
 #' @export
+#' @export
 option.theor_price <- function(object,
                                underlying,
                                ttm,

@@ -45,5 +45,39 @@ make_option(
 Object of class "option"
 }
 \description{
-Create an option instrument
+Option is the basic S3 object of the Suite describing this derivative financial
+instrument, provided with methods for extracting its value along time, up to expiration,
+as well as greeks and othe useful data. make_option is the constructor for specifying
+all the option features at entry.
+}
+\details{
+Concerning entry_price (premium) and implied volatility, user, at construction, can
+specify both, if known. In this case, the theor_price method will return the price of
+the option as returned by the relevant theoretical pricing model, allowing an immediate
+verification whether the indicated (quoted) price is fair, or it represent a contract
+undervaluation or overvaluation.
+
+In case the user provides only an entry price, the system automatically calculates the
+corresponding implied volatility according to the relevant pricing model (Black-Scholes for
+European style options or Bjerksund-Stensland for American options). In case implied volatility
+is provided but no entry price, the entry price will be calculated according to the model.
+For this being possible the user must provide the price of the underlying security in the appropriate
+input argument, or the system produces a warning and an error.
+}
+\examples{
+may_put <- make_option(right = "p",
+                       strike = 50,
+                       expiry = as.Date("2026-05-15"),
+                       style = "a",
+                       commission = 1.00,
+                       entry_price = 1.27,
+                       underlying_at_entry = 51.7)
+# Implied volatility was automatically calculated
+(iv <- option.get_iv(may_put))  # Returns 0.2498553
+
+# Use it in further calculations
+option.value(may_put, underlying = 52, ttm = 0.1) * iv
+
+print(may_put) 
+
 }

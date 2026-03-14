@@ -12,7 +12,7 @@ require(fOptions)
 #' @param type "c" for call or "p" for put
 #' @param S Spot price
 #' @param K Strike price
-#' @param r Risk‑free rate (if NULL, uses global)
+#' @param r Risk free rate (if NULL, uses global)
 #' @param q Dividend yield
 #' @param T Time to maturity (years)
 #' @param iv Implied volatility
@@ -89,7 +89,7 @@ price_european <- function(type = c("c", "p"),
 
 Phi <- function(x) pnorm(x)
 
-#' Finite‑difference helpers
+#' Finite difference helpers
 fd_greek <- function(f, x, h = 1e-4, ...) {
   (f(x * (1 + h), ...) - f(x * (1 - h), ...)) / (2 * x * h)
 }
@@ -125,7 +125,7 @@ fd_rho <- function(f, r, h = 1e-4, ...) {
 #' @param type "c" for call or "p" for put
 #' @param S Spot
 #' @param K Strike
-#' @param r Risk‑free rate (if NULL, uses global)
+#' @param r Risk free rate (if NULL, uses global)
 #' @param q Dividend yield
 #' @param T Time to maturity
 #' @param iv Implied volatility

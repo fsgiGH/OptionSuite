@@ -146,6 +146,7 @@ Three construction modes in `make_option()`:
 
 ---
 
+<<<<<<< HEAD
 ## Greeks Display Conventions (Update)
 
 **Date:** 2026-03-08
@@ -167,4 +168,6 @@ All Greeks are returned with the following scaling to match industry standards (
 - Theta is daily (not annualized) because traders think in daily decay
 - Delta/Gamma are raw per-share sensitivities
 
+=======
+>>>>>>> ea649fbc5c33806b423d40032aadca029e1f0a60
 *This file will be updated as new design decisions are made.*

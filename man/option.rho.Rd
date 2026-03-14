@@ -27,9 +27,4 @@ Numeric theta (per share, daily)
 \description{
 Returns the option's rho (per-share sensitivity to 1\% change of risk-free interest rate).
 }
-\examples{
-opt <- make_option("c", strike=100, expiry="2026-12-31", 
-                   entry_iv=0.2, underlying_at_entry=100)
-option.rho(opt, underlying=105, ttm=0.5, r = 0.06)
-
-}
+\keyword{internal}

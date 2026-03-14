@@ -9,3 +9,4 @@ underlying.delta(object, ...)
 \description{
 Delta of underlying (always 1 per share)
 }
+\keyword{internal}

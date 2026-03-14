@@ -9,3 +9,4 @@ underlying.entry_cost(object)
 \description{
 Entry cost for underlying position (per share)
 }
+\keyword{internal}

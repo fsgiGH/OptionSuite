@@ -7,7 +7,32 @@
 .optionsuite$r <- 0.05                       # risk‑free rate (5%)
 .optionsuite$day_count <- "calendar/365"     # "calendar/365" or "trading/252"
 .optionsuite$min_reliable_ttm <- 0.0014      # from empirical testing
+.optionsuite$use_commission <- FALSE
 
+#' Set whether to include commission in calculations. At startup the Suite ignores
+#' commissions so a call to this function is needed to change the default behavior
+#' of the suite.
+#' @param use Logical, TRUE to include commissions (DEFAULT), FALSE to ignore.
+#' @examples
+#' set_use_commission(TRUE)
+#' 
+#' @export
+set_use_commission <- function(use = TRUE) {
+  stopifnot(is.logical(use), length(use) == 1)
+  .optionsuite_comission <- use
+  invisible()
+}
+
+#' Get current commission setting
+#' @return Logical, TRUE if commissions are enabled
+#' @examples
+#' get_use_commission()
+#' @export
+get_use_commission <- function() {
+  .optionsuite$use_commission
+}
+
+#' 
 #' Set global risk‑free rate
 #' 
 #' @param rate Numeric, annualised rate (e.g., 0.05 for 5%)

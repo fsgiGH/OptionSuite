@@ -9,3 +9,4 @@ underlying.gamma(object, ...)
 \description{
 Gamma of underlying (always 0)
 }
+\keyword{internal}

@@ -9,3 +9,4 @@ option.intrinsic(object, underlying)
 \description{
 Intrinsic value
 }
+\keyword{internal}

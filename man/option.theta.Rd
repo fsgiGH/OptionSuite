@@ -27,9 +27,4 @@ Numeric theta (per share, daily)
 \description{
 Returns the option's theta (per-share sensitivity to time decay, daily).
 }
-\examples{
-opt <- make_option("c", strike=100, expiry="2026-12-31", 
-                   entry_iv=0.2, underlying_at_entry=100)
-option.theta(opt, underlying=105, ttm=0.5)
-
-}
+\keyword{internal}

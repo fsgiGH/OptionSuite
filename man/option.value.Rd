@@ -28,3 +28,4 @@ Numeric value
 Given an option object, a price of the underlying instrument, a time to maturity, and
 a value of the implied volatility, this method returns the corresponding value of the option.
 }
+\keyword{internal}

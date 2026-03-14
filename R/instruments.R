@@ -189,7 +189,7 @@ make_option <- function(right = c("c", "p"),
       underlying_at_entry = underlying_at_entry,
       dividend_yield_at_entry = dividend_yield_at_entry
     ),
-    class = "option"
+    class = c("option", "instrument")
   )
 }
 
@@ -232,28 +232,8 @@ print.option <- function(x, ...) {
 #' @param r Risk‑free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
 #' @param ... Additional arguments passed to price_option
-#' 
-#' @examples
-#' # example code
-#' may_put <- make_option(right = "p",
-#'                        strike = 50,
-#'                        expiry = as.Date("2026-05-15"),
-#'                        style = "a",
-#'                        commission = 1.00,
-#'                        entry_price = 1.27,
-#'                        date_of_entry = as.Date("2026-03-09)
-#'                        underlying_at_entry = 51.7)
-#' valuation_date <- as.Date("2026-04-15")
-#' valuation_price <- 49.5
-#' valuation_iv <- 0.35
-#' valuation_ttm <- date_to_ttm (as.Date("2026-05-15"), valuation_date)
-#' option.value(may_put,
-#'              valuation_price,
-#'              valuation_ttm,
-#'              valuation_iv)
-#' 
 #' @return Numeric value
-#' @export
+#' @keywords internal
 option.value <- function(object,
                          underlying,
                          ttm,
@@ -264,7 +244,7 @@ option.value <- function(object,
   UseMethod("option.value")
 }
 
-#' @export
+#' @keywords internal
 option.value.option <- function(object,
                                 underlying,
                                 ttm,
@@ -308,13 +288,7 @@ option.value.option <- function(object,
 #' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric delta (per share)
-#' 
-#' @examples
-#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
-#'                    entry_iv=0.2, underlying_at_entry=100)
-#' option.delta(opt, underlying=105, ttm=0.5)
-#' 
-#' @export
+#' @keywords internal
 option.delta <- function(object,
                          underlying,
                          ttm,
@@ -325,7 +299,7 @@ option.delta <- function(object,
   UseMethod("option.delta")
 }
 
-#' @export
+#' @keywords internal
 option.delta.option <- function(object,
                                 underlying,
                                 ttm,
@@ -363,13 +337,7 @@ option.delta.option <- function(object,
 #' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric gamma (per share)
-#' 
-#' @examples
-#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
-#'                    entry_iv=0.2, underlying_at_entry=100)
-#' option.gamma(opt, underlying=105, ttm=0.5)
-#' 
-#' @export
+#' @keywords internal
 option.gamma <- function(object,
                          underlying,
                          ttm,
@@ -380,7 +348,7 @@ option.gamma <- function(object,
   UseMethod("option.gamma")
 }
 
-#' @export
+#' @keywords internal
 option.gamma.option <- function(object,
                                 underlying,
                                 ttm,
@@ -418,13 +386,7 @@ option.gamma.option <- function(object,
 #' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric vega (per share)
-#' 
-#' @examples
-#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
-#'                    entry_iv=0.2, underlying_at_entry=100)
-#' option.vega(opt, underlying=105, ttm=0.5, volatility = 0.25)
-#' 
-#' @export
+#' @keywords internal
 option.vega <- function(object,
                         underlying,
                         ttm,
@@ -435,7 +397,7 @@ option.vega <- function(object,
   UseMethod("option.vega")
 }
 
-#' @export
+#' @keywords internal
 option.vega.option <- function(object,
                                underlying,
                                ttm,
@@ -473,13 +435,7 @@ option.vega.option <- function(object,
 #' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric theta (per share, daily)
-#' 
-#' @examples
-#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
-#'                    entry_iv=0.2, underlying_at_entry=100)
-#' option.theta(opt, underlying=105, ttm=0.5)
-#' 
-#' @export
+#' @keywords internal
 option.theta <- function(object,
                          underlying,
                          ttm,
@@ -490,7 +446,7 @@ option.theta <- function(object,
   UseMethod("option.theta")
 }
 
-#' @export
+#' @keywords internal
 option.theta.option <- function(object,
                                 underlying,
                                 ttm,
@@ -528,13 +484,7 @@ option.theta.option <- function(object,
 #' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric theta (per share, daily)
-#' 
-#' @examples
-#' opt <- make_option("c", strike=100, expiry="2026-12-31", 
-#'                    entry_iv=0.2, underlying_at_entry=100)
-#' option.rho(opt, underlying=105, ttm=0.5, r = 0.06)
-#' 
-#' @export
+#' @keywords internal
 option.rho <- function(object,
                        underlying,
                        ttm,
@@ -545,7 +495,7 @@ option.rho <- function(object,
   UseMethod("option.rho")
 }
 
-#' @export
+#' @keywords internal
 option.rho.option <- function(object,
                               underlying,
                               ttm,
@@ -587,26 +537,7 @@ option.rho.option <- function(object,
 #' }
 #' 
 #' @return Numeric theoretical price (per share)
-#' 
-#' @examples
-#' # On 09/03/2026 SPY closed at 678.27 and TWS is indicating an average IV of 20.3%
-#' # The Jun18(2026) 275 call is selling for 31.00x31.46 (mid price = 31.23). Risk free
-#' # rate is 4.5%, and SPY divident yield is 1.1%
-#' set_global_r(0.045)
-#' entry_date <- as.Date("2026-03-09")
-#' june_call <- make_option(right = "c",
-#'                          strike = 675,
-#'                          expiry = as.Date("2026-06-18"),
-#'                          style = "a",
-#'                          entry_price = 31.23,
-#'                          entry_iv = 0.203,
-#'                          date_of_entry = entry_date,
-#'                          underlying_at_entry = 678.27,
-#'                          dividend_yield_at_entry = 0.011)
-#' ttm <- date_to_ttm(as.Date("2026-06-18"), entry_date)
-#' option.theor_price(june_call, 678.27, ttm)
-#' @export
-#' @export
+#' @keywords internal
 option.theor_price <- function(object,
                                underlying,
                                ttm,
@@ -621,7 +552,7 @@ option.theor_price <- function(object,
 }
 
 #' Intrinsic value
-#' @export
+#' @keywords internal
 option.intrinsic <- function(object, underlying) {
   if (object$right == "c") {
     max(underlying - object$strike, 0)
@@ -631,7 +562,7 @@ option.intrinsic <- function(object, underlying) {
 }
 
 #' Extrinsic value = total value - intrinsic
-#' @export
+#' @keywords internal
 option.extrinsic <- function(object,
                              underlying,
                              ttm,
@@ -661,7 +592,7 @@ option.extrinsic <- function(object,
 #' @param q Dividend yield (default 0)
 #' @param ... Additional arguments passed to price_option
 #' @return A data frame with one row and multiple columns
-#' @export
+#' @keywords internal
 option.analytics <- function(object,
                              underlying,
                              ttm,
@@ -672,7 +603,7 @@ option.analytics <- function(object,
   UseMethod("option.analytics")
 }
 
-#' @export
+#' @keywords internal
 option.analytics.option <- function(object,
                                     underlying,
                                     ttm,
@@ -826,7 +757,7 @@ make_underlying <- function(symbol,
       entry_price = entry_price,
       date_of_entry = date_of_entry
     ),
-    class = "underlying"
+    class = c("underlying", "instrument")
   )
 }
 
@@ -848,73 +779,73 @@ print.underlying <- function(x, ...) {
 #' @param object An object of class "underlying"
 #' @param price Current market price
 #' @return Numeric value (per share)
-#' @export
+#' @keywords internal
 underlying.value <- function(object, price) {
   UseMethod("underlying.value")
 }
 
-#' @export
+#' @keywords internal
 underlying.value.underlying <- function(object, price) {
   price
 }
 
 #' Delta of underlying (always 1 per share)
-#' @export
+#' @keywords internal
 underlying.delta <- function(object, ...) {
   UseMethod("underlying.delta")
 }
 
-#' @export
+#' @keywords internal
 underlying.delta.underlying <- function(object, ...) {
   1
 }
 
 #' Gamma of underlying (always 0)
-#' @export
+#' @keywords internal
 underlying.gamma <- function(object, ...) {
   UseMethod("underlying.gamma")
 }
 
-#' @export
+#' @keywords internal
 underlying.gamma.underlying <- function(object, ...) {
   0
 }
 
 #' Vega of underlying (always 0)
-#' @export
+#' @keywords internal
 underlying.vega <- function(object, ...) {
   UseMethod("underlying.vega")
 }
 
-#' @export
+#' @keywords internal
 underlying.vega.underlying <- function(object, ...) {
   0
 }
 
 #' Theta of underlying (always 0 — no time decay)
-#' @export
+#' @keywords internal
 underlying.theta <- function(object, ...) {
   UseMethod("underlying.theta")
 }
 
-#' @export
+#' @keywords internal
 underlying.theta.underlying <- function(object, ...) {
   0
 }
 
 #' Rho of underlying (always 0)
-#' @export
+#' @keywords internal
 underlying.rho <- function(object, ...) {
   UseMethod("underlying.rho")
 }
 
-#' @export
+#' @keywords internal
 underlying.rho.underlying <- function(object, ...) {
   0
 }
 
 #' Entry cost for underlying position (per share)
-#' @export
+#' @keywords internal
 underlying.entry_cost <- function(object) {
   if (is.null(object$entry_price)) {
     return(0)
@@ -923,12 +854,12 @@ underlying.entry_cost <- function(object) {
 }
 
 #' Complete analytics for underlying
-#' @export
+#' @keywords internal
 underlying.analytics <- function(object, price, ...) {
   UseMethod("underlying.analytics")
 }
 
-#' @export
+#' @keywords internal
 underlying.analytics.underlying <- function(object, price, ...) {
   data.frame(
     symbol = object$symbol,
@@ -944,4 +875,664 @@ underlying.analytics.underlying <- function(object, price, ...) {
     rho = 0,
     stringsAsFactors = FALSE
   )
+}
+
+# ============================================================================
+# Instrument Superclass - Unified API for all instruments
+# ============================================================================
+
+#' Value of an instrument
+#' 
+#' Returns the current market value of any instrument (option or underlying).
+#' Uses stored defaults when parameters are omitted.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric value (per share)
+#' 
+#' @examples
+#' # Create an option with all entry data
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_price = 31.23,
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27,
+#'                        dividend_yield_at_entry = 0.011)
+#' 
+#' # Value at entry (uses stored defaults)
+#' instrument.value(call_opt)
+#' 
+#' # Value at different spot price
+#' instrument.value(call_opt, underlying = 700)
+#' 
+#' # Value with different volatility
+#' instrument.value(call_opt, iv = 0.25)
+#' 
+#' # Create an underlying
+#' spy <- make_underlying(symbol = "SPY", entry_price = 450)
+#' 
+#' # Value of underlying
+#' instrument.value(spy)  # Uses stored entry price
+#' instrument.value(spy, underlying = 460)  # Current price
+#' 
+#' #Create an option
+#' may_put <- make_option(right = "p",
+#'                        strike = 50,
+#'                        expiry = as.Date("2026-05-15"),
+#'                        style = "a",
+#'                        commission = 1.00,
+#'                        entry_price = 1.27,
+#'                        date_of_entry = as.Date("2026-03-09")
+#'                        underlying_at_entry = 51.7)
+#' valuation_date <- as.Date("2026-04-15")
+#' valuation_price <- 49.5
+#' valuation_iv <- 0.35
+#' valuation_ttm <- date_to_ttm (as.Date("2026-05-15"), valuation_date)
+#' may_put |> instrument.value(valuation_price,
+#'                             valuation_ttm,
+#'                             valuation_iv)
+#' 
+#' @export
+instrument.value <- function(obj,
+                             underlying = NULL,
+                             ttm = NULL,
+                             iv = NULL,
+                             r = NULL,
+                             q = NULL) {
+  UseMethod("instrument.value")
+}
+
+#' @export
+instrument.value.option <- function(obj,
+                                    underlying = NULL,
+                                    ttm = NULL,
+                                    iv = NULL,
+                                    r = NULL,
+                                    q = NULL) {
+  # Use stored values if not provided
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(iv)) iv <- obj$iv
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  # Validate required inputs
+  if (is.null(underlying)) stop("No underlying price provided or stored in option object")
+  if (is.null(iv)) stop("No volatility provided or stored in option object")
+  if (is.null(ttm)) stop("Cannot calculate time to maturity - missing expiry or date_of_entry")
+  
+  option.value(obj, underlying, ttm, iv, r, q)
+}
+
+#' @export
+instrument.value.underlying <- function(obj,
+                                        underlying = NULL,
+                                        ttm = NULL,
+                                        iv = NULL,
+                                        r = NULL,
+                                        q = NULL) {
+  # For underlying, only price matters
+  if (is.null(underlying)) underlying <- obj$entry_price
+  if (is.null(underlying)) stop("No price provided or stored in underlying object")
+  
+  underlying.value(obj, underlying)
+}
+
+#' Delta of an instrument
+#' 
+#' Returns the delta of any instrument (per-share sensitivity to $1 change in underlying).
+#' For underlyings, delta is always 1.0.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric delta (per share)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27,
+#'                        dividend_yield_at_entry = 0.011)
+#' 
+#' instrument.delta(call_opt)
+#' instrument.delta(call_opt, underlying = 700)
+#' 
+#' spy <- make_underlying(symbol = "SPY")
+#' instrument.delta(spy)  # Returns 1.0
+#' 
+#' @export
+instrument.delta <- function(obj,
+                             underlying = NULL,
+                             ttm = NULL,
+                             iv = NULL,
+                             r = NULL,
+                             q = NULL) {
+  UseMethod("instrument.delta")
+}
+
+#' @export
+instrument.delta.option <- function(obj,
+                                    underlying = NULL,
+                                    ttm = NULL,
+                                    iv = NULL,
+                                    r = NULL,
+                                    q = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(iv)) iv <- obj$iv
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  if (is.null(underlying)) stop("No underlying price provided or stored")
+  if (is.null(iv)) stop("No volatility provided or stored")
+  
+  option.delta(obj, underlying, ttm, iv, r, q)
+}
+
+#' @export
+instrument.delta.underlying <- function(obj,
+                                        underlying = NULL,
+                                        ttm = NULL,
+                                        iv = NULL,
+                                        r = NULL,
+                                        q = NULL) {
+  underlying.delta(obj)
+}
+
+#' Gamma of an instrument
+#' 
+#' Returns the gamma of any instrument (per-share sensitivity of delta to $1 change).
+#' For underlyings, gamma is always 0.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric gamma (per share)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27)
+#' 
+#' instrument.gamma(call_opt)
+#' 
+#' spy <- make_underlying(symbol = "SPY")
+#' instrument.gamma(spy)  # Returns 0
+#' 
+#' @export
+instrument.gamma <- function(obj,
+                             underlying = NULL,
+                             ttm = NULL,
+                             iv = NULL,
+                             r = NULL,
+                             q = NULL) {
+  UseMethod("instrument.gamma")
+}
+
+#' @export
+instrument.gamma.option <- function(obj,
+                                    underlying = NULL,
+                                    ttm = NULL,
+                                    iv = NULL,
+                                    r = NULL,
+                                    q = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(iv)) iv <- obj$iv
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  option.gamma(obj, underlying, ttm, iv, r, q)
+}
+
+#' @export
+instrument.gamma.underlying <- function(obj,
+                                        underlying = NULL,
+                                        ttm = NULL,
+                                        iv = NULL,
+                                        r = NULL,
+                                        q = NULL) {
+  0
+}
+
+#' Vega of an instrument
+#' 
+#' Returns the vega of any instrument (per-share sensitivity to 1% change in IV).
+#' For underlyings, vega is always 0.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric vega (per share, per 1% IV change)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27)
+#' 
+#' instrument.vega(call_opt)
+#' 
+#' spy <- make_underlying(symbol = "SPY")
+#' instrument.vega(spy)  # Returns 0
+#' 
+#' @export
+instrument.vega <- function(obj,
+                            underlying = NULL,
+                            ttm = NULL,
+                            iv = NULL,
+                            r = NULL,
+                            q = NULL) {
+  UseMethod("instrument.vega")
+}
+
+#' @export
+instrument.vega.option <- function(obj,
+                                   underlying = NULL,
+                                   ttm = NULL,
+                                   iv = NULL,
+                                   r = NULL,
+                                   q = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(iv)) iv <- obj$iv
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  option.vega(obj, underlying, ttm, iv, r, q)
+}
+
+#' @export
+instrument.vega.underlying <- function(obj,
+                                       underlying = NULL,
+                                       ttm = NULL,
+                                       iv = NULL,
+                                       r = NULL,
+                                       q = NULL) {
+  0
+}
+
+#' Theta of an instrument
+#' 
+#' Returns the theta of any instrument (per-share daily time decay).
+#' For underlyings, theta is always 0.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric theta (per share, daily)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27)
+#' 
+#' instrument.theta(call_opt)
+#' 
+#' spy <- make_underlying(symbol = "SPY")
+#' instrument.theta(spy)  # Returns 0
+#' 
+#' @export
+instrument.theta <- function(obj,
+                             underlying = NULL,
+                             ttm = NULL,
+                             iv = NULL,
+                             r = NULL,
+                             q = NULL) {
+  UseMethod("instrument.theta")
+}
+
+#' @export
+instrument.theta.option <- function(obj,
+                                    underlying = NULL,
+                                    ttm = NULL,
+                                    iv = NULL,
+                                    r = NULL,
+                                    q = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(iv)) iv <- obj$iv
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  option.theta(obj, underlying, ttm, iv, r, q)
+}
+
+#' @export
+instrument.theta.underlying <- function(obj,
+                                        underlying = NULL,
+                                        ttm = NULL,
+                                        iv = NULL,
+                                        r = NULL,
+                                        q = NULL) {
+  0
+}
+
+#' Rho of an instrument
+#' 
+#' Returns the rho of any instrument (per-share sensitivity to 1% change in rates).
+#' For underlyings, rho is always 0.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric rho (per share, per 1% rate change)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27)
+#' 
+#' instrument.rho(call_opt)
+#' 
+#' spy <- make_underlying(symbol = "SPY")
+#' instrument.rho(spy)  # Returns 0
+#' 
+#' @export
+instrument.rho <- function(obj,
+                           underlying = NULL,
+                           ttm = NULL,
+                           iv = NULL,
+                           r = NULL,
+                           q = NULL) {
+  UseMethod("instrument.rho")
+}
+
+#' @export
+instrument.rho.option <- function(obj,
+                                  underlying = NULL,
+                                  ttm = NULL,
+                                  iv = NULL,
+                                  r = NULL,
+                                  q = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(iv)) iv <- obj$iv
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  option.rho(obj, underlying, ttm, iv, r, q)
+}
+
+#' @export
+instrument.rho.underlying <- function(obj,
+                                      underlying = NULL,
+                                      ttm = NULL,
+                                      iv = NULL,
+                                      r = NULL,
+                                      q = NULL) {
+  0
+}
+
+#' Theoretical price of an instrument using stored IV
+#' 
+#' For options, returns the theoretical price using stored IV.
+#' For underlyings, returns the current price (same as instrument.value).
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric theoretical price (per share)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_price = 31.23,
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27,
+#'                        dividend_yield_at_entry = 0.011)
+#' 
+#' instrument.theor_price(call_opt)  # Should match entry price
+#' 
+#' spy <- make_underlying(symbol = "SPY", entry_price = 450)
+#' instrument.theor_price(spy)  # Returns entry price
+#' @export
+instrument.theor_price <- function(obj,
+                                   underlying = NULL,
+                                   ttm = NULL,
+                                   r = NULL,
+                                   q = NULL) {
+  UseMethod("instrument.theor_price")
+}
+
+#' @export
+instrument.theor_price.option <- function(obj,
+                                          underlying = NULL,
+                                          ttm = NULL,
+                                          r = NULL,
+                                          q = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  if (is.null(obj$iv)) stop("No stored IV for this option")
+  
+  option.value(obj, underlying, ttm, iv = obj$iv, r, q)
+}
+
+#' @export
+instrument.theor_price.underlying <- function(obj,
+                                              underlying = NULL,
+                                              ttm = NULL,
+                                              r = NULL,
+                                              q = NULL) {
+  if (is.null(underlying)) underlying <- obj$entry_price
+  if (is.null(underlying)) stop("No price provided or stored")
+  
+  underlying.value(obj, underlying)
+}
+
+#' Intrinsic value of an instrument
+#' 
+#' For options, returns max(0, S - K) for calls, max(0, K - S) for puts.
+#' For underlyings, returns the current price.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' 
+#' @return Numeric intrinsic value (per share)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        underlying_at_entry = 678.27)
+#' 
+#' instrument.intrinsic(call_opt, underlying = 680)
+#' 
+#' spy <- make_underlying(symbol = "SPY", entry_price = 450)
+#' instrument.intrinsic(spy, underlying = 460)
+#' 
+#' @export
+instrument.intrinsic <- function(obj, underlying = NULL) {
+  UseMethod("instrument.intrinsic")
+}
+
+#' @export
+instrument.intrinsic.option <- function(obj, underlying = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(underlying)) stop("No underlying price provided or stored")
+  
+  option.intrinsic(obj, underlying)
+}
+
+#' @export
+instrument.intrinsic.underlying <- function(obj, underlying = NULL) {
+  if (is.null(underlying)) underlying <- obj$entry_price
+  if (is.null(underlying)) stop("No price provided or stored")
+  
+  underlying
+}
+
+#' Extrinsic value of an instrument
+#' 
+#' For options, returns total value minus intrinsic value.
+#' For underlyings, always returns 0.
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return Numeric extrinsic value (per share)
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27)
+#' 
+#' instrument.extrinsic(call_opt)
+#' 
+#' spy <- make_underlying(symbol = "SPY")
+#' instrument.extrinsic(spy)  # Returns 0
+#' 
+#' @export
+instrument.extrinsic <- function(obj,
+                                 underlying = NULL,
+                                 ttm = NULL,
+                                 iv = NULL,
+                                 r = NULL,
+                                 q = NULL) {
+  UseMethod("instrument.extrinsic")
+}
+
+#' @export
+instrument.extrinsic.option <- function(obj,
+                                        underlying = NULL,
+                                        ttm = NULL,
+                                        iv = NULL,
+                                        r = NULL,
+                                        q = NULL) {
+  total <- instrument.value(obj, underlying, ttm, iv, r, q)
+  intrinsic <- instrument.intrinsic(obj, underlying)
+  total - intrinsic
+}
+
+#' @export
+instrument.extrinsic.underlying <- function(obj,
+                                            underlying = NULL,
+                                            ttm = NULL,
+                                            iv = NULL,
+                                            r = NULL,
+                                            q = NULL) {
+  0
+}
+
+#' Complete analytics for an instrument
+#' 
+#' Returns a data frame with all current metrics for any instrument.
+#' For options, includes all Greeks and derived values.
+#' For underlyings, includes price and basic Greeks (delta=1, others=0).
+#' 
+#' @param obj An object of class "instrument" (option or underlying)
+#' @param underlying Current spot price (if NULL, uses stored value)
+#' @param ttm Time to maturity in years (if NULL, auto-calculated)
+#' @param iv Implied volatility (if NULL, uses stored IV for options, ignored for underlyings)
+#' @param r Risk-free rate (if NULL, uses global)
+#' @param q Dividend yield (if NULL, uses stored value for options, 0 for underlyings)
+#' 
+#' @return A data frame with one row and multiple columns
+#' 
+#' @examples
+#' call_opt <- make_option(right = "c",
+#'                        strike = 675,
+#'                        expiry = as.Date("2026-06-18"),
+#'                        style = "a",
+#'                        entry_iv = 0.203,
+#'                        underlying_at_entry = 678.27,
+#'                        dividend_yield_at_entry = 0.011)
+#' 
+#' instrument.analytics(call_opt)
+#' 
+#' spy <- make_underlying(symbol = "SPY", entry_price = 450)
+#' instrument.analytics(spy)
+#' 
+#' @export
+instrument.analytics <- function(obj,
+                                 underlying = NULL,
+                                 ttm = NULL,
+                                 iv = NULL,
+                                 r = NULL,
+                                 q = NULL) {
+  UseMethod("instrument.analytics")
+}
+
+#' @export
+instrument.analytics.option <- function(obj,
+                                        underlying = NULL,
+                                        ttm = NULL,
+                                        iv = NULL,
+                                        r = NULL,
+                                        q = NULL) {
+  if (is.null(underlying)) underlying <- obj$underlying_at_entry
+  if (is.null(ttm)) ttm <- date_to_ttm(obj$expiry, obj$date_of_entry)
+  if (is.null(iv)) iv <- obj$iv
+  if (is.null(r)) r <- get_global_r()
+  if (is.null(q)) q <- obj$dividend_yield_at_entry %||% 0
+  
+  option.analytics(obj, underlying, ttm, iv, r, q)
+}
+
+#' @export
+instrument.analytics.underlying <- function(obj,
+                                            underlying = NULL,
+                                            ttm = NULL,
+                                            iv = NULL,
+                                            r = NULL,
+                                            q = NULL) {
+  if (is.null(underlying)) underlying <- obj$entry_price
+  if (is.null(underlying)) stop("No price provided or stored")
+  
+  underlying.analytics(obj, underlying)
 }

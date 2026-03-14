@@ -9,3 +9,4 @@ underlying.vega(object, ...)
 \description{
 Vega of underlying (always 0)
 }
+\keyword{internal}

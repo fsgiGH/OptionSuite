@@ -9,3 +9,4 @@ underlying.theta(object, ...)
 \description{
 Theta of underlying (always 0 — no time decay)
 }
+\keyword{internal}

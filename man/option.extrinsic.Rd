@@ -17,3 +17,4 @@ option.extrinsic(
 \description{
 Extrinsic value = total value - intrinsic
 }
+\keyword{internal}

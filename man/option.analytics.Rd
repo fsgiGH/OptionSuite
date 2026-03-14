@@ -42,3 +42,4 @@ Returns a data frame with one row containing:
 \item Derived values (intrinsic, extrinsic, theor_price if applicable)
 }
 }
+\keyword{internal}

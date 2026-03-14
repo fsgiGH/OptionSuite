@@ -9,3 +9,4 @@ underlying.analytics(object, price, ...)
 \description{
 Complete analytics for underlying
 }
+\keyword{internal}

@@ -9,3 +9,4 @@ underlying.rho(object, ...)
 \description{
 Rho of underlying (always 0)
 }
+\keyword{internal}

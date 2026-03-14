@@ -146,7 +146,6 @@ Three construction modes in `make_option()`:
 
 ---
 
-<<<<<<< HEAD
 ## Greeks Display Conventions (Update)
 
 **Date:** 2026-03-08
@@ -168,6 +167,45 @@ All Greeks are returned with the following scaling to match industry standards (
 - Theta is daily (not annualized) because traders think in daily decay
 - Delta/Gamma are raw per-share sensitivities
 
-=======
->>>>>>> ea649fbc5c33806b423d40032aadca029e1f0a60
+---
+
+## Instrument Superclass Architecture (Planned for Version 0.1.1)
+
+**Date:** 2026-03-14
+
+**Context:** 
+As we prepare to build legs and strategies that can contain both options and underlyings, we need a unified interface that works regardless of instrument type. The current separate methods (`option.value`, `underlying.value`) will become cumbersome.
+
+**Decision:**
+- Create an **`instrument` superclass** by adding `"instrument"` to the class attribute of both `option` and `underlying` objects
+- Define **instrument-level generics**: `instrument.value()`, `instrument.delta()`, `instrument.gamma()`, `instrument.vega()`, `instrument.theta()`, `instrument.rho()`, `instrument.theor_price()`, `instrument.analytics()`
+- Make the existing `option.*` and `underlying.*` methods **internal** (not exported)
+- Add **intelligent defaults** to all methods:
+  - `underlying`: uses stored entry price if available
+  - `ttm`: auto-calculated from expiry and date_of_entry
+  - `iv`: uses stored IV
+  - `r`: uses global rate
+  - `q`: uses stored dividend yield
+- Add **commission control** via global setting `set_use_commission()`
+
+**Rationale:**
+- **Unified API**: Strategy-level code can treat all instruments identically
+- **User-friendly**: Default parameters reduce boilerplate for common use cases
+- **Future-proof**: Adding new instrument types becomes trivial
+- **Clean separation**: Internal methods remain for specialized use
+
+**Example (future):**
+```r
+# Current style (still works but not exported)
+option.value(my_call, 100, 0.5)
+
+# New unified style (exported)
+my_call |> instrument.value()  # Uses stored defaults
+my_stock |> instrument.delta()  # Returns 1.0
+my_strategy |> leg.value()      # Will sum positions
+
+# Commission control
+set_use_commission(TRUE)
+leg.entry_cost(my_leg)  # Now includes commissions
+
 *This file will be updated as new design decisions are made.*

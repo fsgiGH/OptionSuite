@@ -610,6 +610,7 @@ option.rho.option <- function(object,
 option.theor_price <- function(object,
                                underlying,
                                ttm,
+                               volatility = NULL,
                                r = NULL,
                                q = 0,
                                ...) {

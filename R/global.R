@@ -9,6 +9,8 @@
 .optionsuite$min_reliable_ttm <- 0.0014      # from empirical testing
 .optionsuite$use_commission <- FALSE
 
+#' set_use_commission
+#' 
 #' Set whether to include commission in calculations. At startup the Suite ignores
 #' commissions so a call to this function is needed to change the default behavior
 #' of the suite.
@@ -19,10 +21,12 @@
 #' @export
 set_use_commission <- function(use = TRUE) {
   stopifnot(is.logical(use), length(use) == 1)
-  .optionsuite_comission <- use
+  .optionsuite$use_commission <- use
   invisible()
 }
 
+#' get_use_commission
+#' 
 #' Get current commission setting
 #' @return Logical, TRUE if commissions are enabled
 #' @examples
@@ -183,14 +187,22 @@ get_min_reliable_ttm <- function() {
 #' 
 #' @export
 date_to_ttm <- function(expiry, valuation_date = Sys.Date()) {
-  # Handle character expiry
+  # Handle character expiry with friendly error
   if (is.character(expiry)) {
-    expiry <- as.Date(expiry)
+    expiry_parsed <- tryCatch(as.Date(expiry), error = function(e) NULL)
+    if (is.null(expiry_parsed)) {
+      stop("Cannot parse expiry string: '", expiry, "'. Use format 'YYYY-MM-DD'")
+    }
+    expiry <- expiry_parsed
   }
   
   # Handle character valuation_date
   if (is.character(valuation_date)) {
-    valuation_date <- as.Date(valuation_date)
+    valuation_parsed <- tryCatch(as.Date(valuation_date), error = function(e) NULL)
+    if (is.null(valuation_parsed)) {
+      stop("Cannot parse valuation_date string: '", valuation_date, "'. Use format 'YYYY-MM-DD'")
+    }
+    valuation_date <- valuation_parsed
   }
   
   if (is.numeric(expiry)) {

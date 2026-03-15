@@ -2,9 +2,7 @@
 % Please edit documentation in R/global.R
 \name{set_use_commission}
 \alias{set_use_commission}
-\title{Set whether to include commission in calculations. At startup the Suite ignores
-commissions so a call to this function is needed to change the default behavior
-of the suite.}
+\title{set_use_commission}
 \usage{
 set_use_commission(use = TRUE)
 }

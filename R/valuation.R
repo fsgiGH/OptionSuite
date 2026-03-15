@@ -32,6 +32,31 @@ price_european <- function(type = c("c", "p"),
   # --- Exact value at or below threshold ---
   if (T <= min_ttm) {
     intrinsic <- if (type == "c") max(S - K, 0) else max(K - S, 0)
+    
+    # BASE CASE: When T == min_ttm, compute full price (not intrinsic)
+    if (T == min_ttm) {
+      rquantlib_type <- ifelse(type == "c", "call", "put")
+      opt <- RQuantLib::EuropeanOption(
+        type      = rquantlib_type,
+        underlying = S,
+        strike    = K,
+        dividendYield = q,
+        riskFreeRate = r,
+        maturity  = T,
+        volatility = iv
+      )
+      return(list(
+        value = opt$value,
+        delta = opt$delta,
+        gamma = opt$gamma,
+        vega  = opt$vega * 0.01,
+        theta = opt$theta / 365,
+        rho   = opt$rho * 0.01,
+        dividendRho = if (!is.null(opt$dividendRho)) opt$dividendRho * 0.01 else NULL
+      ))
+    }
+    
+    # For T < min_ttm
     if (T == 0 || !use_min_ttm) {
       # Greeks at exact expiry are theoretical (step function)
       delta <- if (type == "c") {
@@ -50,7 +75,7 @@ price_european <- function(type = c("c", "p"),
       ))
     } else {
       # Value = exact, Greeks from min_reliable_ttm
-      gr <- price_european(type, S, K, r, q, min_ttm, iv, use_min_ttm = FALSE)
+      gr <- price_european(type, S, K, r, q, min_ttm, iv, use_min_ttm = TRUE)
       gr$value <- intrinsic
       return(gr)
     }
@@ -71,12 +96,12 @@ price_european <- function(type = c("c", "p"),
   
   # Apply broker-convention scaling
   list(
-    value = opt$value,                    # Already per share
-    delta = opt$delta,                     # Already per share
-    gamma = opt$gamma,                     # Already per share
-    vega  = opt$vega * 0.01,                # Per share, per 1% IV change
-    theta = opt$theta / 365,                 # Per share, daily
-    rho   = opt$rho * 0.01,                  # Per share, per 1% rate change
+    value = opt$value,
+    delta = opt$delta,
+    gamma = opt$gamma,
+    vega  = opt$vega * 0.01,
+    theta = opt$theta / 365,
+    rho   = opt$rho * 0.01,
     dividendRho = if (!is.null(opt$dividendRho)) opt$dividendRho * 0.01 else NULL
   )
 }

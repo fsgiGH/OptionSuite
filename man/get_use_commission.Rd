@@ -2,7 +2,7 @@
 % Please edit documentation in R/global.R
 \name{get_use_commission}
 \alias{get_use_commission}
-\title{Get current commission setting}
+\title{get_use_commission}
 \usage{
 get_use_commission()
 }

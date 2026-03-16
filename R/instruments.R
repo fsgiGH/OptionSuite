@@ -231,7 +231,6 @@ print.option <- function(x, ...) {
 #' @param volatility Volatility (if NULL, uses stored iv)
 #' @param r Risk‑free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
-#' @param ... Additional arguments passed to price_option
 #' @return Numeric value
 #' @keywords internal
 option.value <- function(object,
@@ -239,8 +238,7 @@ option.value <- function(object,
                          ttm,
                          volatility = NULL,
                          r = NULL,
-                         q = 0,
-                         ...) {
+                         q = 0) {
   UseMethod("option.value")
 }
 
@@ -250,8 +248,7 @@ option.value.option <- function(object,
                                 ttm,
                                 volatility = NULL,
                                 r = NULL,
-                                q = 0,
-                                ...) {
+                                q = 0) {
   if (is.null(volatility)) {
     volatility <- object$iv
   }
@@ -269,8 +266,7 @@ option.value.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    iv = volatility,
-    ...
+    iv = volatility
   )
   res$value
 }
@@ -285,7 +281,6 @@ option.value.option <- function(object,
 #' @param volatility Volatility (if NULL, uses stored IV)
 #' @param r Risk-free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
-#' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric delta (per share)
 #' @keywords internal
@@ -294,8 +289,7 @@ option.delta <- function(object,
                          ttm,
                          volatility = NULL,
                          r = NULL,
-                         q = 0,
-                         ...) {
+                         q = 0) {
   UseMethod("option.delta")
 }
 
@@ -305,8 +299,7 @@ option.delta.option <- function(object,
                                 ttm,
                                 volatility = NULL,
                                 r = NULL,
-                                q = 0,
-                                ...) {
+                                q = 0) {
   if (is.null(volatility)) {
     volatility <- object$iv
   }
@@ -318,8 +311,7 @@ option.delta.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    iv = volatility,
-    ...
+    iv = volatility
   )
   res$delta
 }
@@ -334,7 +326,6 @@ option.delta.option <- function(object,
 #' @param volatility Volatility (if NULL, uses stored IV)
 #' @param r Risk-free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
-#' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric gamma (per share)
 #' @keywords internal
@@ -343,8 +334,7 @@ option.gamma <- function(object,
                          ttm,
                          volatility = NULL,
                          r = NULL,
-                         q = 0,
-                         ...) {
+                         q = 0) {
   UseMethod("option.gamma")
 }
 
@@ -354,8 +344,7 @@ option.gamma.option <- function(object,
                                 ttm,
                                 volatility = NULL,
                                 r = NULL,
-                                q = 0,
-                                ...) {
+                                q = 0) {
   if (is.null(volatility)) {
     volatility <- object$iv
   }
@@ -367,8 +356,7 @@ option.gamma.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    iv = volatility,
-    ...
+    iv = volatility
   )
   res$gamma
 }
@@ -383,7 +371,6 @@ option.gamma.option <- function(object,
 #' @param volatility Volatility (if NULL, uses stored IV)
 #' @param r Risk-free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
-#' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric vega (per share)
 #' @keywords internal
@@ -392,8 +379,7 @@ option.vega <- function(object,
                         ttm,
                         volatility = NULL,
                         r = NULL,
-                        q = 0,
-                        ...) {
+                        q = 0) {
   UseMethod("option.vega")
 }
 
@@ -403,8 +389,7 @@ option.vega.option <- function(object,
                                ttm,
                                volatility = NULL,
                                r = NULL,
-                               q = 0,
-                               ...) {
+                               q = 0) {
   if (is.null(volatility)) {
     volatility <- object$iv
   }
@@ -416,8 +401,7 @@ option.vega.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    iv = volatility,
-    ...
+    iv = volatility
   )
   res$vega
 }
@@ -432,7 +416,6 @@ option.vega.option <- function(object,
 #' @param volatility Volatility (if NULL, uses stored IV)
 #' @param r Risk-free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
-#' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric theta (per share, daily)
 #' @keywords internal
@@ -441,8 +424,7 @@ option.theta <- function(object,
                          ttm,
                          volatility = NULL,
                          r = NULL,
-                         q = 0,
-                         ...) {
+                         q = 0) {
   UseMethod("option.theta")
 }
 
@@ -452,8 +434,7 @@ option.theta.option <- function(object,
                                 ttm,
                                 volatility = NULL,
                                 r = NULL,
-                                q = 0,
-                                ...) {
+                                q = 0) {
   if (is.null(volatility)) {
     volatility <- object$iv
   }
@@ -465,8 +446,7 @@ option.theta.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    iv = volatility,
-    ...
+    iv = volatility
   )
   res$theta
 }
@@ -481,7 +461,6 @@ option.theta.option <- function(object,
 #' @param volatility Volatility (if NULL, uses stored IV)
 #' @param r Risk-free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
-#' @param ... Additional arguments passed to price_option
 #' 
 #' @return Numeric theta (per share, daily)
 #' @keywords internal
@@ -490,8 +469,7 @@ option.rho <- function(object,
                        ttm,
                        volatility = NULL,
                        r = NULL,
-                       q = 0,
-                       ...) {
+                       q = 0) {
   UseMethod("option.rho")
 }
 
@@ -501,8 +479,7 @@ option.rho.option <- function(object,
                               ttm,
                               volatility = NULL,
                               r = NULL,
-                              q = 0,
-                              ...) {
+                              q = 0) {
   if (is.null(volatility)) {
     volatility <- object$iv
   }
@@ -514,8 +491,7 @@ option.rho.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    iv = volatility,
-    ...
+    iv = volatility
   )
   res$rho
 }
@@ -543,12 +519,11 @@ option.theor_price <- function(object,
                                ttm,
                                volatility = NULL,
                                r = NULL,
-                               q = 0,
-                               ...) {
+                               q = 0) {
   if (is.null(volatility)) {
     volatility <- object$iv
   }
-  option.value(object, underlying, ttm, volatility = volatility, r = r, q = q, ...)
+  option.value(object, underlying, ttm, volatility = volatility, r = r, q = q)
 }
 
 #' Intrinsic value
@@ -568,9 +543,8 @@ option.extrinsic <- function(object,
                              ttm,
                              volatility = NULL,
                              r = NULL,
-                             q = 0,
-                             ...) {
-  total <- option.value(object, underlying, ttm, volatility, r, q, ...)
+                             q = 0) {
+  total <- option.value(object, underlying, ttm, volatility, r, q)
   intrinsic <- option.intrinsic(object, underlying)
   total - intrinsic
 }
@@ -590,7 +564,6 @@ option.extrinsic <- function(object,
 #' @param volatility Volatility (if NULL, uses stored iv)
 #' @param r Risk‑free rate (if NULL, uses global)
 #' @param q Dividend yield (default 0)
-#' @param ... Additional arguments passed to price_option
 #' @return A data frame with one row and multiple columns
 #' @keywords internal
 option.analytics <- function(object,
@@ -598,8 +571,7 @@ option.analytics <- function(object,
                              ttm,
                              volatility = NULL,
                              r = NULL,
-                             q = 0,
-                             ...) {
+                             q = 0) {
   UseMethod("option.analytics")
 }
 
@@ -609,8 +581,7 @@ option.analytics.option <- function(object,
                                     ttm,
                                     volatility = NULL,
                                     r = NULL,
-                                    q = 0,
-                                    ...) {
+                                    q = 0) {
   
   # --- Handle defaults ---
   if (is.null(volatility)) {
@@ -634,8 +605,7 @@ option.analytics.option <- function(object,
     r = r,
     q = q,
     T = ttm,
-    iv = volatility,
-    ...
+    iv = volatility
   )
   
   # --- Derived values ---
@@ -648,7 +618,7 @@ option.analytics.option <- function(object,
   
   # --- Theoretical price (if IV stored) ---
   theor_price <- if (!is.null(object$iv)) {
-    option.value(object, underlying, ttm, volatility = object$iv, r = r, q = q, ...)
+    option.value(object, underlying, ttm, volatility = object$iv, r = r, q = q)
   } else {
     NA
   }
@@ -1354,7 +1324,7 @@ instrument.theor_price.option <- function(obj,
   
   if (is.null(obj$iv)) stop("No stored IV for this option")
   
-  option.value(obj, underlying, ttm, iv = obj$iv, r, q)
+  option.value(obj, underlying, ttm, volatility = obj$iv, r, q)
 }
 
 #' @export

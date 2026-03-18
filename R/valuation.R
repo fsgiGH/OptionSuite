@@ -114,11 +114,34 @@ price_european <- function(type = c("c", "p"),
 
 Phi <- function(x) pnorm(x)
 
-#' Finite difference helpers
+#' Finite difference helpers for Greeks calculation
+#' 
+#' @title Finite difference helpers
+#' @description
+#' These functions are internal helpers for calculating Greeks via finite differences.
+#' They are not intended for direct use by end users.
+#' 
+#' @param f A function to differentiate
+#' @param x Point at which to evaluate the derivative
+#' @param h Step size for finite difference
+#' @param iv Implied volatility for vega calculation
+#' @param T Time to maturity for theta calculation
+#' @param r Risk-free rate for rho calculation
+#' @param ... Additional arguments passed to f
+#' 
+#' @keywords internal
+#' @name fd_helpers
+NULL
+
+#' @rdname fd_helpers
+#' keywords internal
 fd_greek <- function(f, x, h = 1e-4, ...) {
   (f(x * (1 + h), ...) - f(x * (1 - h), ...)) / (2 * x * h)
 }
 
+
+#' @rdname fd_helpers
+#' keywords internal
 fd_gamma <- function(f, x, h = 1e-4, ...) {
   f_up <- f(x * (1 + h), ...)
   f_mid <- f(x, ...)
@@ -126,6 +149,9 @@ fd_gamma <- function(f, x, h = 1e-4, ...) {
   (f_up - 2*f_mid + f_down) / (x * h)^2
 }
 
+
+#' @rdname fd_helpers
+#' keywords internal
 fd_vega <- function(f, iv, h = 1e-4, ...) {
   # Raw derivative: change for 1.0 change in iv
   raw_deriv <- (f(iv = iv * (1 + h), ...) - f(iv = iv * (1 - h), ...)) / (2 * iv * h)
@@ -133,12 +159,17 @@ fd_vega <- function(f, iv, h = 1e-4, ...) {
   raw_deriv * 0.01
 }
 
+#' @rdname fd_helpers
+#' keywords internal
 fd_theta <- function(f, T, h = 1/365, ...) {
   if (T <= h) return(NA)
   # Daily theta (broker convention)
   (f(T = T - h, ...) - f(T = T, ...)) / 1
 }
 
+
+#' @rdname fd_helpers
+#' keywords internal
 fd_rho <- function(f, r, h = 1e-4, ...) {
   # Raw derivative: change for 1.0 change in r
   raw_deriv <- (f(r = r * (1 + h), ...) - f(r = r * (1 - h), ...)) / (2 * r * h)
@@ -301,8 +332,9 @@ price_american <- function(type = c("c", "p"),
 #'              T = ttm,
 #'              iv = 0.288)
 #'              
-#' # As of March 8th 2026, SPX May14Put6740 is quoted on TWS 228.10x234.10, while S&P 500 quotes 6738.15
-#' # ATM implied volatility is reported as 20.5% while VIX is 29.49. ToS reports IV of 22.40%.
+#' # As of March 8th 2026, SPX May14Put6740 is quoted on TWS 228.10x234.10, 
+#' # while S&P 500 quotes 6738.15 ATM implied volatility is reported 
+#' # as 20.5% while VIX is 29.49. ToS reports IV of 22.40%.
 #' # These options are European style with no dividends
 #' 
 #' expiry <- as.Date("2026-05-14")

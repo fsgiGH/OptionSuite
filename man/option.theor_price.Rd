@@ -4,15 +4,7 @@
 \alias{option.theor_price}
 \title{Theoretical price using stored volatility}
 \usage{
-option.theor_price(
-  object,
-  underlying,
-  ttm,
-  volatility = NULL,
-  r = NULL,
-  q = 0,
-  ...
-)
+option.theor_price(object, underlying, ttm, volatility = NULL, r = NULL, q = 0)
 }
 \value{
 Numeric theoretical price (per share)

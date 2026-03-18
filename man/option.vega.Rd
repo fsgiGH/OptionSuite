@@ -4,7 +4,7 @@
 \alias{option.vega}
 \title{Vega of an option}
 \usage{
-option.vega(object, underlying, ttm, volatility = NULL, r = NULL, q = 0, ...)
+option.vega(object, underlying, ttm, volatility = NULL, r = NULL, q = 0)
 }
 \arguments{
 \item{object}{An object of class "option"}
@@ -18,8 +18,6 @@ option.vega(object, underlying, ttm, volatility = NULL, r = NULL, q = 0, ...)
 \item{r}{Risk-free rate (if NULL, uses global)}
 
 \item{q}{Dividend yield (default 0)}
-
-\item{...}{Additional arguments passed to price_option}
 }
 \value{
 Numeric vega (per share)

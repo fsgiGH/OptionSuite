@@ -4,15 +4,7 @@
 \alias{option.extrinsic}
 \title{Extrinsic value = total value - intrinsic}
 \usage{
-option.extrinsic(
-  object,
-  underlying,
-  ttm,
-  volatility = NULL,
-  r = NULL,
-  q = 0,
-  ...
-)
+option.extrinsic(object, underlying, ttm, volatility = NULL, r = NULL, q = 0)
 }
 \description{
 Extrinsic value = total value - intrinsic

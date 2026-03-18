@@ -22,6 +22,7 @@ For underlyings, returns the current price.
 call_opt <- make_option(right = "c",
                        strike = 675,
                        expiry = as.Date("2026-06-18"),
+                       entry_iv = 0.2,
                        underlying_at_entry = 678.27)
 
 instrument.intrinsic(call_opt, underlying = 680)

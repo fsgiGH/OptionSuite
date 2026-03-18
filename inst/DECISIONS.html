@@ -383,19 +383,19 @@ that traders are accustomed to - <strong>Clean separation</strong>:
 Calculation (per-share) vs. presentation (contract/share level) -
 <strong>Flexibility</strong>: Easy to scale for different multipliers or
 position sizes</p>
-<p><strong>Example:</strong> ```r # Internal calculation
-option.delta(opt) # 0.0052 (per share) underlying.delta(stock) # 1.0
-(per share)</p>
-</div>
-</div>
-<div id="position-display-future" class="section level1">
-<h1>Position display (future)</h1>
-<p>position.delta(opt_leg) # Shows 0.52 (contract-level)
-position.delta(stk_leg) # Shows 1.0 (share-level) position.delta(total)
-# Shows 1.52 (correct sum)</p>
+<p><strong>Example:</strong></p>
+<pre class="r"><code># Internal calculation
+option.delta(opt)           # 0.0052 (per share)
+underlying.delta(stock)      # 1.0 (per share)
+
+# Position display (future)
+position.delta(opt_leg)      # Shows 0.52 (contract-level)
+position.delta(stk_leg)      # Shows 1.0 (share-level)
+position.delta(total)        # Shows 1.52 (correct sum)</code></pre>
 <p><strong>Implementation Status:</strong> To be implemented in future
 leg/strategy classes (planned for Version 0.2.0).</p>
 <hr />
+</div>
 <div id="day-count-convention" class="section level2">
 <h2>Day-Count Convention</h2>
 <p><strong>Date:</strong> 2026-03-07</p>
@@ -413,9 +413,11 @@ volatility used as-is - Global setting
 <p><strong>Rationale:</strong> - Keeps TTM calculation simple and
 consistent - Isolates convention differences to volatility scaling only
 - User inputs IV exactly as reported by their broker</p>
-<p><strong>Example:</strong>
-``<code>r set_day_count_convention(&quot;trading/252&quot;) price_option(..., sigma = 0.30)  # 30% IV from ToS automatically scaled **Implementation Status:** Implemented in</code>valuation.R<code>(</code>price_option`
-dispatcher).</p>
+<p><strong>Example:</strong></p>
+<pre class="r"><code>set_day_count_convention(&quot;trading/252&quot;)
+price_option(..., sigma = 0.30)  # 30% IV from ToS automatically scaled</code></pre>
+<p><strong>Implementation Status:</strong> Implemented in
+<code>valuation.R</code> (<code>price_option</code> dispatcher).</p>
 <hr />
 </div>
 <div id="minimum-reliable-ttm-threshold" class="section level2">
@@ -573,22 +575,144 @@ Strategy-level code can treat all instruments identically -
 for common use cases - <strong>Future-proof</strong>: Adding new
 instrument types becomes trivial - <strong>Clean separation</strong>:
 Internal methods remain for specialized use</p>
-<p><strong>Example (future):</strong> ```r # Current style (still works
-but not exported) option.value(my_call, 100, 0.5)</p>
+<p><strong>Example (future):</strong></p>
+<pre class="r"><code># Current style (still works but not exported)
+option.value(my_call, 100, 0.5)
+
+# New unified style (exported)
+my_call |&gt; instrument.value()  # Uses stored defaults
+my_stock |&gt; instrument.delta()  # Returns 1.0
+my_strategy |&gt; leg.value()      # Will sum positions
+
+# Commission control
+set_use_commission(TRUE)
+leg.entry_cost(my_leg)  # Now includes commissions</code></pre>
+<hr />
 </div>
+<div id="instrument-superclass-and-unified-api-version-0.1.1" class="section level2">
+<h2>Instrument Superclass and Unified API (Version 0.1.1)</h2>
+<p><strong>Date:</strong> 2026-03-18</p>
+<p><strong>Context:</strong> As we prepare to build legs and strategies
+that can contain both options and underlyings, we need a unified
+interface that works regardless of instrument type.</p>
+<p><strong>Decision:</strong> - Created an
+<strong><code>instrument</code> superclass</strong> by adding
+<code>&quot;instrument&quot;</code> to the class attribute of both
+<code>option</code> and <code>underlying</code> objects - Defined
+<strong>instrument-level generics</strong>:
+<code>instrument.value()</code>, <code>instrument.delta()</code>,
+<code>instrument.gamma()</code>, <code>instrument.vega()</code>,
+<code>instrument.theta()</code>, <code>instrument.rho()</code>,
+<code>instrument.theor_price()</code>,
+<code>instrument.intrinsic()</code>,
+<code>instrument.extrinsic()</code>, <code>instrument.analytics()</code>
+- Made the existing <code>option.*</code> and <code>underlying.*</code>
+methods <strong>internal</strong> (not exported) - Added
+<strong>intelligent defaults</strong> to all methods: -
+<code>underlying</code>: uses stored entry price if available -
+<code>ttm</code>: auto-calculated from expiry and date_of_entry -
+<code>iv</code>: uses stored IV - <code>r</code>: uses global rate -
+<code>q</code>: uses stored dividend yield - Added <strong>commission
+control</strong> via global setting <code>set_use_commission()</code> -
+Removed <code>...</code> from method signatures to prevent silent
+argument misdirection</p>
+<p><strong>Rationale:</strong> - <strong>Unified API</strong>:
+Strategy-level code can treat all instruments identically -
+<strong>User-friendly</strong>: Default parameters reduce boilerplate
+for common use cases - <strong>Type safety</strong>: Explicit parameters
+prevent the “multiple actual arguments” bugs we encountered -
+<strong>Future-proof</strong>: Adding new instrument types becomes
+trivial</p>
+<p><strong>Example:</strong></p>
+<pre class="r"><code># Create an option with all entry data
+call_opt &lt;- make_option(right = &quot;c&quot;, strike = 675, expiry = &quot;2026-06-18&quot;,
+                       entry_price = 31.23, entry_iv = 0.203,
+                       underlying_at_entry = 678.27)
+
+# Value at entry (uses stored defaults)
+instrument.value(call_opt)
+
+# Value at different spot with different volatility
+instrument.value(call_opt, underlying = 700, iv = 0.25)
+
+# Create an underlying
+spy &lt;- make_underlying(symbol = &quot;SPY&quot;, entry_price = 450)
+
+# Unified API works the same
+instrument.value(spy)
+instrument.delta(spy)  # Returns 1.0</code></pre>
 </div>
-<div id="new-unified-style-exported" class="section level1">
-<h1>New unified style (exported)</h1>
-<p>my_call |&gt; instrument.value() # Uses stored defaults my_stock
-|&gt; instrument.delta() # Returns 1.0 my_strategy |&gt; leg.value() #
-Will sum positions</p>
+<div id="also-add-a-note-about-testing" class="section level2">
+<h2>Also Add a Note About Testing</h2>
 </div>
-<div id="commission-control" class="section level1">
-<h1>Commission control</h1>
-<p>set_use_commission(TRUE) leg.entry_cost(my_leg) # Now includes
-commissions</p>
+<div id="testing-philosophy" class="section level2">
+<h2>Testing Philosophy</h2>
+<p><strong>Date:</strong> 2026-03-18</p>
+<p><strong>Decision:</strong> - <strong>Unit tests</strong> for all core
+functionality (106 tests) - <strong>Real market data tests</strong>
+using IBKR TWS quotes (SPX, TLT) - Tests use <strong>fixed
+dates</strong> (<code>date_of_entry</code>) to ensure reproducibility -
+Each test verifies both <strong>correctness</strong> and <strong>broker
+convention scaling</strong></p>
+<p><strong>Rationale:</strong> - Ensures package works with real-world
+data, not just theory - Prevents regression when adding new features -
+Builds user confidence in the package</p>
+</div>
+<div id="future-directions---updated-by-fabio" class="section level2">
+<h2>Future Directions - Updated by Fabio</h2>
+<div id="version-0.2.0-planned-1" class="section level3">
+<h3>Version 0.2.0 (Planned)</h3>
+<ul>
+<li>Components: Legs for positions (quantity, direction, instrument) and
+strategies (lists of legs)</li>
+<li>Calculations: applying multidimensional matrices for obtaining
+frames (it will be commented)
+<ul>
+<li>(Greeks curves across spot prices)</li>
+</ul></li>
+</ul>
+</div>
+<div id="version-0.3.0-planned-1" class="section level3">
+<h3>Version 0.3.0 (Planned)</h3>
+<ul>
+<li>Decision and implementation of graphical representation</li>
+</ul>
+</div>
+<div id="version-0.4.0-planned-1" class="section level3">
+<h3>Version 0.4.0 (Planned)</h3>
+<ul>
+<li>Analytics: extracting statistics and numbers from payoff
+calculations/curves
+<ul>
+<li>(Probability of profit calculations)</li>
+<li>(Convexity metrics (TCI/CCI))</li>
+</ul></li>
+</ul>
+</div>
+<div id="version-0.5.0-planned" class="section level3">
+<h3>Version 0.5.0 (Planned)</h3>
+<ul>
+<li>Connectivity with IBKR</li>
+</ul>
+</div>
+<div id="version-0.6.0-planned" class="section level3">
+<h3>Version 0.6.0 (Planned)</h3>
+<ul>
+<li>Realistic simulation: Volatility surfaces, inerpolation and
+simulation</li>
+</ul>
+</div>
+<div id="version-0.7.0-planned" class="section level3">
+<h3>Version 0.7.0 (Planned)</h3>
+<p>-Reporting</p>
+</div>
+<div id="version-0.8.0-planned" class="section level3">
+<h3>Version 0.8.0 (Planned)</h3>
+<p>-GUI (initiated by Fabio)</p>
 <p><em>This file will be updated as new design decisions are
 made.</em></p>
+</div>
+</div>
 </div>
 
 

@@ -19,7 +19,7 @@ run into the risk of obtaining unreliable values. But the user is free to bypass
 This function shows the minimal time to maturity currently in use.
 }
 \examples{
-old_min_ttm <- get_min_reliable_ttm
+old_min_ttm <- get_min_reliable_ttm()
 set_min_reliable_ttm(0.025)
 get_min_reliable_ttm()
 set_min_reliable_ttm(old_min_ttm) # restore

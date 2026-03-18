@@ -129,7 +129,7 @@ get_day_count_convention <- function() {
 #' @param ttm Numeric, positive the choosen minimal time to maturity value use for option value calculations
 #' 
 #' @examples
-#' old_min_ttm <- get_min_reliable_ttm
+#' old_min_ttm <- get_min_reliable_ttm()
 #' set_min_reliable_ttm(0.025)
 #' get_min_reliable_ttm()
 #' set_min_reliable_ttm(old_min_ttm) # restore
@@ -153,7 +153,7 @@ set_min_reliable_ttm <- function(ttm) {
 #' This function shows the minimal time to maturity currently in use.
 #' 
 #' @examples
-#' old_min_ttm <- get_min_reliable_ttm
+#' old_min_ttm <- get_min_reliable_ttm()
 #' set_min_reliable_ttm(0.025)
 #' get_min_reliable_ttm()
 #' set_min_reliable_ttm(old_min_ttm) # restore

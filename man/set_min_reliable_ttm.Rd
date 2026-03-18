@@ -16,7 +16,7 @@ it has been discovered that these algorithms do not provide valid results for ti
 run into the risk of obtaining unreliable values. But the user is free to bypass this constraint, under her own responsibility.
 }
 \examples{
-old_min_ttm <- get_min_reliable_ttm
+old_min_ttm <- get_min_reliable_ttm()
 set_min_reliable_ttm(0.025)
 get_min_reliable_ttm()
 set_min_reliable_ttm(old_min_ttm) # restore

@@ -63,8 +63,9 @@ price_option(style = "a",
              T = ttm,
              iv = 0.288)
              
-# As of March 8th 2026, SPX May14Put6740 is quoted on TWS 228.10x234.10, while S&P 500 quotes 6738.15
-# ATM implied volatility is reported as 20.5\% while VIX is 29.49. ToS reports IV of 22.40\%.
+# As of March 8th 2026, SPX May14Put6740 is quoted on TWS 228.10x234.10, 
+# while S&P 500 quotes 6738.15 ATM implied volatility is reported 
+# as 20.5\% while VIX is 29.49. ToS reports IV of 22.40\%.
 # These options are European style with no dividends
 
 expiry <- as.Date("2026-05-14")

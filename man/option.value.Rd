@@ -4,7 +4,7 @@
 \alias{option.value}
 \title{Value of an option}
 \usage{
-option.value(object, underlying, ttm, volatility = NULL, r = NULL, q = 0, ...)
+option.value(object, underlying, ttm, volatility = NULL, r = NULL, q = 0)
 }
 \arguments{
 \item{object}{An object of class "option"}
@@ -18,8 +18,6 @@ option.value(object, underlying, ttm, volatility = NULL, r = NULL, q = 0, ...)
 \item{r}{Risk‑free rate (if NULL, uses global)}
 
 \item{q}{Dividend yield (default 0)}
-
-\item{...}{Additional arguments passed to price_option}
 }
 \value{
 Numeric value

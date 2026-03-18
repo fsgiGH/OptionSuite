@@ -43,6 +43,7 @@ underlying.delta(stock)      # 1.0 (per share)
 position.delta(opt_leg)      # Shows 0.52 (contract-level)
 position.delta(stk_leg)      # Shows 1.0 (share-level)
 position.delta(total)        # Shows 1.52 (correct sum)
+```
 
 **Implementation Status:** To be implemented in future leg/strategy classes (planned for Version 0.2.0).
 
@@ -74,6 +75,7 @@ This affects implied volatility values even for the same option.
 ```r
 set_day_count_convention("trading/252")
 price_option(..., sigma = 0.30)  # 30% IV from ToS automatically scaled
+```
 **Implementation Status:** Implemented in `valuation.R` (`price_option` dispatcher).
 
 ---
@@ -207,5 +209,98 @@ my_strategy |> leg.value()      # Will sum positions
 # Commission control
 set_use_commission(TRUE)
 leg.entry_cost(my_leg)  # Now includes commissions
+```
+
+---
+
+## Instrument Superclass and Unified API (Version 0.1.1)
+
+**Date:** 2026-03-18
+
+**Context:**
+As we prepare to build legs and strategies that can contain both options and underlyings, we need a unified interface that works regardless of instrument type.
+
+**Decision:**
+- Created an **`instrument` superclass** by adding `"instrument"` to the class attribute of both `option` and `underlying` objects
+- Defined **instrument-level generics**: `instrument.value()`, `instrument.delta()`, `instrument.gamma()`, `instrument.vega()`, `instrument.theta()`, `instrument.rho()`, `instrument.theor_price()`, `instrument.intrinsic()`, `instrument.extrinsic()`, `instrument.analytics()`
+- Made the existing `option.*` and `underlying.*` methods **internal** (not exported)
+- Added **intelligent defaults** to all methods:
+  - `underlying`: uses stored entry price if available
+  - `ttm`: auto-calculated from expiry and date_of_entry
+  - `iv`: uses stored IV
+  - `r`: uses global rate
+  - `q`: uses stored dividend yield
+- Added **commission control** via global setting `set_use_commission()`
+- Removed `...` from method signatures to prevent silent argument misdirection
+
+**Rationale:**
+- **Unified API**: Strategy-level code can treat all instruments identically
+- **User-friendly**: Default parameters reduce boilerplate for common use cases
+- **Type safety**: Explicit parameters prevent the "multiple actual arguments" bugs we encountered
+- **Future-proof**: Adding new instrument types becomes trivial
+
+**Example:**
+```r
+# Create an option with all entry data
+call_opt <- make_option(right = "c", strike = 675, expiry = "2026-06-18",
+                       entry_price = 31.23, entry_iv = 0.203,
+                       underlying_at_entry = 678.27)
+
+# Value at entry (uses stored defaults)
+instrument.value(call_opt)
+
+# Value at different spot with different volatility
+instrument.value(call_opt, underlying = 700, iv = 0.25)
+
+# Create an underlying
+spy <- make_underlying(symbol = "SPY", entry_price = 450)
+
+# Unified API works the same
+instrument.value(spy)
+instrument.delta(spy)  # Returns 1.0
+```
+
+## Testing Philosophy
+
+**Date:** 2026-03-18
+
+**Decision:**
+- **Unit tests** for all core functionality (106 tests)
+- **Real market data tests** using IBKR TWS quotes (SPX, TLT)
+- Tests use **fixed dates** (`date_of_entry`) to ensure reproducibility
+- Each test verifies both **correctness** and **broker convention scaling**
+
+**Rationale:**
+- Ensures package works with real-world data, not just theory
+- Prevents regression when adding new features
+- Builds user confidence in the package
+
+## Future Directions - Updated by Fabio
+
+### Version 0.2.0 (Planned)
+- Components: Legs for positions (quantity, direction, instrument) and strategies (lists of legs)
+- Calculations: applying multidimensional matrices for obtaining frames
+(it will be commented)
+   - (Greeks curves across spot prices)
+
+### Version 0.3.0 (Planned)
+- Decision and implementation of graphical representation
+
+### Version 0.4.0 (Planned)
+- Analytics: extracting statistics and numbers from payoff calculations/curves
+   - (Probability of profit calculations)
+   - (Convexity metrics (TCI/CCI))
+
+### Version 0.5.0 (Planned)
+- Connectivity with IBKR
+
+### Version 0.6.0 (Planned)
+- Realistic simulation: Volatility surfaces, inerpolation and simulation
+
+### Version 0.7.0 (Planned)
+-Reporting
+
+### Version 0.8.0 (Planned)
+-GUI (initiated by Fabio)
 
 *This file will be updated as new design decisions are made.*

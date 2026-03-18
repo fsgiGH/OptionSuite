@@ -67,7 +67,7 @@ may_put <- make_option(right = "p",
                        style = "a",
                        commission = 1.00,
                        entry_price = 1.27,
-                       date_of_entry = as.Date("2026-03-09")
+                       date_of_entry = as.Date("2026-03-09"),
                        underlying_at_entry = 51.7)
 valuation_date <- as.Date("2026-04-15")
 valuation_price <- 49.5

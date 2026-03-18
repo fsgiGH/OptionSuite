@@ -42,7 +42,7 @@
 #' (iv <- option.get_iv(may_put))  # Returns 0.2498553
 #' 
 #' # Use it in further calculations
-#' option.value(may_put, underlying = 52, ttm = 0.1) * iv
+#' instrument.value(may_put, underlying = 52, ttm = 0.1) * iv
 #' 
 #' print(may_put) 
 #' 
@@ -133,7 +133,7 @@ make_option <- function(right = c("c", "p"),
         maturity = ttm_at_entry,
         volatility = 0.2  # starting guess
       )
-      entry_iv <- iv_result
+      entry_iv <- as.numeric(iv_result)
     } else {
       # American option
       iv_result <- RQuantLib::AmericanOptionImpliedVolatility(
@@ -146,9 +146,11 @@ make_option <- function(right = c("c", "p"),
         maturity = ttm_at_entry,
         volatility = 0.2  # starting guess
       )
-      entry_iv <- iv_result
+      entry_iv <- as.numeric(iv_result)
     }
   }
+  
+  
   
   # If entry_iv provided without entry_price, calculate price
   if (!is.null(entry_iv) && is.null(entry_price)) {
@@ -674,20 +676,45 @@ option.analytics.option <- function(object,
 
 # ---- Getters ----
 
+#' Get option attributes
+#' 
+#' These functions extract specific attributes from an option object.
+#' They are simple accessors that return the stored value.
+#' 
+#' @param object An object of class "option"
+#' @return The requested attribute value
+#' @name option-getters
+NULL
+
+#' @rdname option-getters
 #' @export
 option.get_right <- function(object) object$right
+
+#' @rdname option-getters
 #' @export
 option.get_strike <- function(object) object$strike
+
+#' @rdname option-getters
 #' @export
 option.get_expiry <- function(object) object$expiry
+
+#' @rdname option-getters
 #' @export
 option.get_style <- function(object) object$style
+
+#' @rdname option-getters
 #' @export
 option.get_multiplier <- function(object) object$multiplier
+
+#' @rdname option-getters
 #' @export
 option.get_commission <- function(object) object$commission
+
+#' @rdname option-getters
 #' @export
 option.get_entry_price <- function(object) object$entry_price
+
+#' @rdname option-getters
 #' @export
 option.get_iv <- function(object) object$iv
 
@@ -899,7 +926,7 @@ underlying.analytics.underlying <- function(object, price, ...) {
 #'                        style = "a",
 #'                        commission = 1.00,
 #'                        entry_price = 1.27,
-#'                        date_of_entry = as.Date("2026-03-09")
+#'                        date_of_entry = as.Date("2026-03-09"),
 #'                        underlying_at_entry = 51.7)
 #' valuation_date <- as.Date("2026-04-15")
 #' valuation_price <- 49.5
@@ -1353,6 +1380,7 @@ instrument.theor_price.underlying <- function(obj,
 #' call_opt <- make_option(right = "c",
 #'                        strike = 675,
 #'                        expiry = as.Date("2026-06-18"),
+#'                        entry_iv = 0.2,
 #'                        underlying_at_entry = 678.27)
 #' 
 #' instrument.intrinsic(call_opt, underlying = 680)

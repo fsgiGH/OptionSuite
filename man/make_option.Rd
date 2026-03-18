@@ -76,7 +76,7 @@ may_put <- make_option(right = "p",
 (iv <- option.get_iv(may_put))  # Returns 0.2498553
 
 # Use it in further calculations
-option.value(may_put, underlying = 52, ttm = 0.1) * iv
+instrument.value(may_put, underlying = 52, ttm = 0.1) * iv
 
 print(may_put) 
 

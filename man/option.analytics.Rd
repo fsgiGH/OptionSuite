@@ -4,15 +4,7 @@
 \alias{option.analytics}
 \title{Complete option analytics (value, greeks, and contract details)}
 \usage{
-option.analytics(
-  object,
-  underlying,
-  ttm,
-  volatility = NULL,
-  r = NULL,
-  q = 0,
-  ...
-)
+option.analytics(object, underlying, ttm, volatility = NULL, r = NULL, q = 0)
 }
 \arguments{
 \item{object}{An object of class "option"}
@@ -26,8 +18,6 @@ option.analytics(
 \item{r}{Risk‑free rate (if NULL, uses global)}
 
 \item{q}{Dividend yield (default 0)}
-
-\item{...}{Additional arguments passed to price_option}
 }
 \value{
 A data frame with one row and multiple columns

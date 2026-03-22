@@ -139,9 +139,8 @@ leg.cash_flow.leg <- function(leg) {
   
   # Add commission if enabled
   if (get_use_commission()) {
-    # Commission is per transaction, not per unit
-    comm <- ifelse(leg$direction == "buy", -leg$commission, leg$commission)
-    raw_cf <- raw_cf + comm
+    # Commission always reduces cash flow
+    raw_cf <- raw_cf - leg$commission
   }
   
   return(raw_cf)

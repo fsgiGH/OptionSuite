@@ -160,8 +160,14 @@ strategy.value.strategy <- function(strategy, underlying, date, iv = NULL, r = N
   
   total <- 0
   for (leg in strategy$legs) {
-    # Calculate TTM for this leg's instrument
-    ttm <- date_to_ttm(leg$instrument$expiry, date)
+    # For options: calculate TTM based on expiry
+    # For underlyings: TTM is not applicable (use 0 or ignore)
+    if (inherits(leg$instrument, "option")) {
+      ttm <- date_to_ttm(leg$instrument$expiry, date)
+    } else {
+      # Underlying has no expiry - TTM is 0 (no time decay)
+      ttm <- 0
+    }
     
     leg_value <- instrument.value(
       leg$instrument,
